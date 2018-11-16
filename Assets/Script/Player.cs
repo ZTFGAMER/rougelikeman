@@ -20,9 +20,9 @@ public class Player : MonoBehaviour {
   public bool m_IsPlayer;
   public List<Card> m_BattleCardList;
   public AnimationManager m_AnimationManager;
-  public Text m_NameText;
-  public Text m_HPText;
-  public Text m_CostText;
+  public Text m_TextName;
+  public Text m_TextHP;
+  public Text m_TextCost;
 
   // Use this for initialization
   void Start () {
@@ -32,10 +32,10 @@ public class Player : MonoBehaviour {
     m_CurrentHP = m_HP;
     m_CurrentCost = m_Cost;
     m_IsAlive = true;
-    m_NameText.text = m_PlayerName;
-    m_HPText.text = m_HP.ToString();
+    m_TextName.text = m_PlayerName;
+    m_TextHP.text = m_HP.ToString();
     if (m_IsPlayer)
-      m_CostText.text = m_Cost.ToString();
+      m_TextCost.text = m_Cost.ToString();
 
   }
 
@@ -64,9 +64,9 @@ public class Player : MonoBehaviour {
 
   void UpdateData()
   {
-    m_NameText.text = m_PlayerName;
-    m_HPText.text = m_CurrentHP.ToString();
+    m_TextName.text = m_PlayerName;
+    m_TextHP.text = m_CurrentHP.ToString();
     if (m_IsPlayer)
-      m_CostText.text = m_CurrentCost.ToString()+"/" +m_Cost.ToString();
+      m_TextCost.text = m_CurrentCost.ToString()+"/" +m_Cost.ToString();
   }
 }

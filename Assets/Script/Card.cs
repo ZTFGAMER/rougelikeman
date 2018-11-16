@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Card : MonoBehaviour {
 
@@ -42,11 +43,40 @@ public class Card : MonoBehaviour {
   public int m_CurrentATK;
   public int m_CurrentArmor;
   public int m_CurrentOrder;
+  public Text m_TextHP;
+  public Text m_TextATK;
+  public Text m_TextCost;
+  public Text m_TextCardName;
 
   // Use this for initialization
   void Start () {
 		
 	}
+
+  public void InitByClone(Card clonecard)
+  {
+    m_CardName = clonecard.m_CardName;
+    m_HP=clonecard.m_HP ;
+    m_ATK=clonecard.m_ATK ;
+    m_Cost=clonecard.m_Cost ;
+    m_CardType=clonecard.m_CardType ;
+    m_HurtEffect=clonecard.m_HurtEffect ;
+  }
+
+  public void PrepareForBattle()
+  {
+    m_CurrentHP = m_HP;
+    m_CurrentCost = m_Cost;
+    m_CurrentATK = m_ATK;
+    m_IsAlive = false;
+    m_TextCardName.text = m_CardName;
+    m_TextCost.text = m_CurrentCost.ToString();
+    if (m_CardType == CardType.Character)
+    {
+      m_TextATK.text = m_CurrentATK.ToString();
+      m_TextHP.text = m_CurrentHP.ToString();
+    }
+  }
 
   public void GetHurt(int damage)
   {

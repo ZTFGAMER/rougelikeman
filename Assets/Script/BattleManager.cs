@@ -12,6 +12,8 @@ public class BattleManager : MonoBehaviour {
   public List<Card> EnemyPreCardList = new List<Card>();
   public Player player;
   public Player enemy;
+  public GameObject PlayerHandArea;
+  public GameObject pfb;
 
   public GameLogic gameLogic;
 
@@ -49,7 +51,7 @@ public class BattleManager : MonoBehaviour {
     card2.m_Cost = 1;
     card2.m_CardType = Card.CardType.Character;
     card2.m_HurtEffect = Card.HurtEffect.Normal;
-    player.m_BattleCardList.Add(card);
+    player.m_BattleCardList.Add(card2);
 
     enemy.m_PlayerName = "野蛮人";
     enemy.m_HP = 30;
@@ -58,7 +60,7 @@ public class BattleManager : MonoBehaviour {
     enemy.m_IsPlayer = false;
 
     Card card3 = this.gameObject.AddComponent<Card>();
-    card3.m_CardName = "圣教军";
+    card3.m_CardName = "蛮族勇士";
     card3.m_HP = 3;
     card3.m_ATK = 3;
     card3.m_Cost = 1;
@@ -67,13 +69,13 @@ public class BattleManager : MonoBehaviour {
     enemy.m_BattleCardList.Add(card3);
 
     Card card4 = this.gameObject.AddComponent<Card>();
-    card4.m_CardName = "弓箭手";
-    card4.m_HP = 1;
-    card4.m_ATK = 5;
-    card4.m_Cost = 1;
-    card4.m_CardType = Card.CardType.Character;
+    card4.m_CardName = "蛮力一击";
+    card4.m_ATK = 8;
+    card4.m_Cost = 2;
+    card4.m_CardType = Card.CardType.Magic;
     card4.m_HurtEffect = Card.HurtEffect.Normal;
     enemy.m_BattleCardList.Add(card4);
+    player.m_BattleCardList.Add(card4);
   }
 
   /// <summary>
@@ -84,12 +86,26 @@ public class BattleManager : MonoBehaviour {
     player.PrepareForBattle();
     enemy.PrepareForBattle();
 
+    foreach (Card card in player.m_BattleCardList)
+    {
+      //pfb = Resources.Load("Resource/HandCardArea") as GameObject;
+      
+      GameObject prefabInstance = Instantiate(pfb) as GameObject;
+      prefabInstance.transform.parent = PlayerHandArea.transform;
+      prefabInstance.GetComponents<Card>()[0].InitByClone(card);
+      prefabInstance.GetComponents<Card>()[0].PrepareForBattle();
+      PlayerHandCardList.Add(prefabInstance.GetComponents<Card>()[0]);
+    }
   }
 
 	// Update is called once per frame
 	void Update () {
-		
-	}
+    UpdateHandCard();
+  }
+
+  void UpdateHandCard()
+  {
+  }
 
   public bool EnterBattleGround(Card card,int row,int column)
   {
