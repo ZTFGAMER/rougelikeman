@@ -11,30 +11,32 @@ public class Player : MonoBehaviour {
     Enemy 
   };
 
+  public string m_PlayerName;
   public int m_HP;
   public int m_Cost;
+  public int m_CurrentHP;
+  public int m_CurrentCost;
   public bool m_IsAlive;
+  public bool m_IsPlayer;
+  public List<Card> m_BattleCardList;
+  public AnimationManager m_AnimationManager;
+  public Text m_NameText;
+  public Text m_HPText;
   public Text m_CostText;
 
-	// Use this for initialization
-	void Start () {
-    m_IsAlive = true;
+  // Use this for initialization
+  void Start () {
   }
 
-  public void InitType(PlayerType type) {
-    switch (type)
-    {
-      case PlayerType.Player:
-        m_HP = Constant.PLAYER_HP;
-        m_Cost = Constant.PLAYER_ENERGY;
-        break;
-      case PlayerType.Enemy:
-        m_HP = Constant.ENEMY_HP;
-        m_Cost = 0;
-        break;
-      default:
-        break;
-    }
+  public void PrepareForBattle() {
+    m_CurrentHP = m_HP;
+    m_CurrentCost = m_Cost;
+    m_IsAlive = true;
+    m_NameText.text = m_PlayerName;
+    m_HPText.text = m_HP.ToString();
+    if (m_IsPlayer)
+      m_CostText.text = m_Cost.ToString();
+
   }
 
   public void GetHurt(int damage) {
@@ -56,7 +58,15 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+    
+    UpdateData();
+  }
 
-    m_CostText.text = m_Cost.ToString();
+  void UpdateData()
+  {
+    m_NameText.text = m_PlayerName;
+    m_HPText.text = m_CurrentHP.ToString();
+    if (m_IsPlayer)
+      m_CostText.text = m_CurrentCost.ToString()+"/" +m_Cost.ToString();
   }
 }

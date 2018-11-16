@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class GameLogic : MonoBehaviour {
 
-  public CardManager cardManager;
-  public PlayerManager playerManager;
+  public BattleManager battleManager;
+  //public JsonUtils jsonutils;
 
 	// Use this for initialization
 	void Start () {
+    battleManager.gameLogic = this;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		

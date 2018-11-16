@@ -164,3 +164,4 @@ C:\Demo\RougelikeMan\Temp\bin\Debug\UnityEngine.SpatialTracking.xml
 C:\Demo\RougelikeMan\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
 C:\Demo\RougelikeMan\obj\Debug\Assembly-CSharp.dll
 C:\Demo\RougelikeMan\obj\Debug\Assembly-CSharp.pdb
+C:\Demo\RougelikeMan\Temp\bin\Debug\LitJson.dll

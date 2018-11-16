@@ -6,53 +6,47 @@ public class Card : MonoBehaviour {
 
   public enum CardType
   {
-    Warrior,
-    Archor,
-    Berserker,
-    FootMan
+    Character,
+    Magic,
+    Trap,
+  };
+  public enum CardSpace
+  {
+    PlayerDeck,
+    PlayerHand,
+    PlayerDrop,
+    PlayerGround,
+    EnemyGround,
+    EnemyPre,
+  };
+  public enum HurtEffect
+  {
+    Normal,//常规
+    Penetrate,//贯穿，对所有排上的敌人造成伤害
+    Backstab,//从最后的敌人开始计算伤害
+    Puncture,//无视护盾造成伤害
   };
 
+  public string m_CardName;
   public int m_HP;
   public int m_Cost;
   public int m_ATK;
+  public CardType m_CardType;
+  public CardSpace m_CardSpace;
+  public HurtEffect m_HurtEffect;
   public bool m_IsAlive;
-  public bool m_IsOnBattleGround;
   public int m_BattleRow;
   public int m_BattleColumn;
+  public int m_CurrentHP;
+  public int m_CurrentCost;
+  public int m_CurrentATK;
+  public int m_CurrentArmor;
+  public int m_CurrentOrder;
 
   // Use this for initialization
   void Start () {
 		
 	}
-
-  public void InitType(CardType type)
-  {
-    switch (type)
-    {
-      case CardType.Warrior:
-        m_Cost = 1;
-        m_HP = 3;
-        m_ATK = 3;
-        break;
-      case CardType.Archor:
-        m_Cost = 1;
-        m_HP = 1;
-        m_ATK = 5;
-        break;
-      case CardType.Berserker:
-        m_Cost = 2;
-        m_HP = 2;
-        m_ATK = 4;
-        break;
-      case CardType.FootMan:
-        m_Cost = 1;
-        m_HP = 6;
-        m_ATK = 0;
-        break;
-      default:
-        break;
-    }
-  }
 
   public void GetHurt(int damage)
   {
@@ -69,14 +63,13 @@ public class Card : MonoBehaviour {
 
   public void SetPlace(int row,int column)
   {
-    m_IsOnBattleGround = true;
     m_BattleColumn = column;
     m_BattleRow = row;
   }
 
   public bool GetPlace(int row, int column)
   {
-    return row == m_BattleRow && column == m_BattleColumn && m_IsOnBattleGround;
+    return row == m_BattleRow && column == m_BattleColumn;
   }
 
   // Update is called once per frame
