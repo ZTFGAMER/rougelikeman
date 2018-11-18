@@ -79,7 +79,7 @@ public class JsonUtils:MonoBehaviour
 
   public void ReadBattleData()
   {
-    string player = OnReadFile("player");
+    //string player = OnReadFile("player");
   }
 
   public string OnReadFile(string path)

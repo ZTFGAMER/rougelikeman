@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\AnimationManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\BattleCube.cs" />
     <Compile Include="Assets\Resources\Scripts\BattleManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Card.cs" />
     <Compile Include="Assets\Resources\Scripts\CardArea.cs" />

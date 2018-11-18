@@ -16,6 +16,7 @@ public class Player : MonoBehaviour {
   public int m_Cost;
   public int m_CurrentHP;
   public int m_CurrentCost;
+  public int m_DrawCardCount = 5;
   public bool m_IsAlive;
   public bool m_IsPlayer;
   public List<Card> m_BattleCardList;
