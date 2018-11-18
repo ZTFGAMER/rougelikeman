@@ -42,6 +42,7 @@ public class Card : MonoBehaviour {
   public int m_BattleRow;
   public int m_BattleColumn;
   public bool m_IsBattleDead;
+  public float m_DeadAnimTime = 0f;
 
   public int m_CurrentHP;
   public int m_CurrentCost;
@@ -53,6 +54,8 @@ public class Card : MonoBehaviour {
   public Text m_TextCost;
   public Text m_TextCardName;
   public GameObject m_ObjectCardSelect;
+
+  public UGUISpriteAnimation animationConfig;
 
   public BattleManager battleManager;
 
@@ -69,8 +72,16 @@ public class Card : MonoBehaviour {
     m_Cost=clonecard.m_Cost ;
     m_CardType=clonecard.m_CardType ;
     m_HurtEffect=clonecard.m_HurtEffect ;
+    InitAnimation(clonecard.animationConfig.m_SpiteName);
     this.battleManager = battlem;
     PrepareForBattle();
+  }
+
+  public void InitAnimation(string animname)
+  {
+    this.animationConfig = this.transform.Find("HandCardAnim").GetComponent<UGUISpriteAnimation>();
+    this.animationConfig.m_SpiteName = animname;
+    this.animationConfig.InitFrame(animname);
   }
 
   public void PrepareForBattle()

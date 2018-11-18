@@ -73,6 +73,8 @@ GameObject:
   - component: {fileID: 222920155482705894}
   - component: {fileID: 114766394575764774}
   - component: {fileID: 114765808657949704}
+  - component: {fileID: 114732666190212588}
+  - component: {fileID: 114953256880661106}
   m_Layer: 5
   m_Name: HandCard
   m_TagString: Untagged
@@ -175,8 +177,9 @@ GameObject:
   - component: {fileID: 224157663159394302}
   - component: {fileID: 222846309455826984}
   - component: {fileID: 114366650504435242}
+  - component: {fileID: 114550758375306228}
   m_Layer: 5
-  m_Name: HandCard
+  m_Name: HandCardAnim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -389,6 +392,26 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114550758375306228
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1971228765282184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8cd7c80733dba84c8f2e58cba13c2b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteFrames: []
+  IsPlaying: 0
+  Foward: 1
+  AutoPlay: 1
+  Loop: 1
+  CurrentStartFrame: 0
+  CurrentEndFrame: 0
+  m_SpiteName: 
+  m_AnimState: 5
 --- !u!114 &114603675356009350
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -449,6 +472,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 1
+--- !u!114 &114732666190212588
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1217362132025374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!114 &114765808657949704
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -484,7 +534,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 114732666190212588}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -516,6 +566,7 @@ MonoBehaviour:
   m_HP: 0
   m_Cost: 0
   m_ATK: 0
+  m_Armor: 0
   m_CardType: 0
   m_CardSpace: 0
   m_HurtEffect: 0
@@ -523,6 +574,8 @@ MonoBehaviour:
   m_IsInBattleGround: 0
   m_BattleRow: 0
   m_BattleColumn: 0
+  m_IsBattleDead: 0
+  m_DeadAnimTime: 0
   m_CurrentHP: 0
   m_CurrentCost: 0
   m_CurrentATK: 0
@@ -533,7 +586,28 @@ MonoBehaviour:
   m_TextCost: {fileID: 114611816006560094}
   m_TextCardName: {fileID: 114098986912960074}
   m_ObjectCardSelect: {fileID: 1688553435425612}
+  animationConfig: {fileID: 0}
   battleManager: {fileID: 0}
+--- !u!114 &114953256880661106
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1217362132025374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8cd7c80733dba84c8f2e58cba13c2b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteFrames: []
+  IsPlaying: 0
+  Foward: 1
+  AutoPlay: 0
+  Loop: 0
+  CurrentStartFrame: 0
+  CurrentEndFrame: 0
+  m_SpiteName: 
+  m_AnimState: 5
 --- !u!222 &222134429153938664
 CanvasRenderer:
   m_ObjectHideFlags: 1
