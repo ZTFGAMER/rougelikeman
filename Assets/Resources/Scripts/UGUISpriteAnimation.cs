@@ -34,9 +34,23 @@ public class UGUISpriteAnimation : MonoBehaviour
 
   public void InitFrame(string animname)
   {
-    InitLoopFrame(animname, "");
-    InitLoopFrame(animname, "_dead");
-    InitLoopFrame(animname, "_melee");
+    if (animname.Contains("magic"))
+    {
+      InitMagic(animname);
+    }
+    else
+    {
+      InitLoopFrame(animname, "");
+      InitLoopFrame(animname, "_dead");
+      InitLoopFrame(animname, "_melee");
+    }
+  }
+
+  public void InitMagic(string animname)
+  {
+    SpriteFrames.Add(Resources.Load<Sprite>("Sprites/" + animname));
+    CurrentStartFrame = 0;
+    CurrentEndFrame = 0;
   }
 
   void InitLoopFrame(string animname, string special)
@@ -61,19 +75,19 @@ public class UGUISpriteAnimation : MonoBehaviour
     { 
       switch (animstate)
       {
-        case AnimState.RunBack:
+        case AnimState.RunToward:
           CurrentStartFrame = 0;
           CurrentEndFrame = FRAMEBASE / 4 - 1;
           break;
-        case AnimState.RunToward:
+        case AnimState.RunBack:
           CurrentStartFrame = FRAMEBASE * 3 / 4;
           CurrentEndFrame = FRAMEBASE - 1;
           break;
-        case AnimState.AttackBack:
+        case AnimState.AttackToward:
           CurrentStartFrame = FRAMEBASE * 2;
           CurrentEndFrame = FRAMEBASE * 2 + FRAMEBASE / 4 - 1;
           break;
-        case AnimState.AttackToward:
+        case AnimState.AttackBack:
           CurrentStartFrame = FRAMEBASE * 2 + FRAMEBASE * 3 / 4;
           CurrentEndFrame = FRAMEBASE * 3 - 1;
           break;
@@ -154,7 +168,7 @@ public class UGUISpriteAnimation : MonoBehaviour
         mCurFrame--;
       }
 
-      if (mCurFrame >= CurrentEndFrame)
+      if (mCurFrame > CurrentEndFrame)
       {
         if (Loop)
         {

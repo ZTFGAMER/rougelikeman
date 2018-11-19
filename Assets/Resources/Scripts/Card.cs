@@ -147,6 +147,10 @@ public class Card : MonoBehaviour {
   {
     m_TextCost.text = m_CurrentCost.ToString();
     m_TextCardName.text = m_CardName;
+    if (this.gameObject.transform.Find("HandCardAnim/HandCard_Cost"))
+    {
+      this.gameObject.transform.Find("HandCardAnim/HandCard_Cost").gameObject.SetActive(!m_IsInBattleGround);
+    }
     if (m_CardType == CardType.Character)
     {
       m_TextATK.text = m_CurrentATK.ToString();

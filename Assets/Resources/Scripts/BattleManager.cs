@@ -41,32 +41,35 @@ public class BattleManager : MonoBehaviour {
     InitCardAreaList("PlayerDropArea");
     InitCardAreaList("EnemyDropArea");
 
-    InitPlayer(player, "圣骑士", 35, 3, true);
-    InitPlayer(enemy, "野蛮人", 30, 3, false);
+    InitPlayer(player, "圣骑士", 35, 3, true, "曹操(骑马)");
+    InitPlayer(enemy, "野蛮人", 30, 3, false, "陆逊");
+    player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
+    enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
 
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "士兵","近卫兵", 1, 3, 3);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "士兵", "近卫兵", 1, 3, 3);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "士兵", "近卫兵", 1, 3, 3);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "盾手", "曹仁", 1, 5, 1);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "盾手", "曹仁", 1, 5, 1);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "盾手", "曹仁", 1, 5, 1);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Puncture);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "指挥官", "夏侯敦(骑马)", 2, 4, 2);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "冲锋", "近卫兵", 1, 0, 0, Card.CardType.Magic);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "爆发", "近卫兵", 0, 0, 0, Card.CardType.Magic);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "坚守", "近卫兵", 1, 0, 0, Card.CardType.Magic);
-    InitCard(FindCardAreaListByName( "PlayerDeckArea"), "巨盾", "近卫兵", 2, 0, 0, Card.CardType.Magic);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵","近卫兵", 1, 3, 3);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵", "近卫兵", 1, 3, 3);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵", "近卫兵", 1, 3, 3);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "盾手", "曹仁", 1, 5, 1);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "盾手", "曹仁", 1, 5, 1);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "盾手", "曹仁", 1, 5, 1);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "指挥官", "夏侯敦(骑马)", 2, 2, 2);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
+    InitCard(FindCardAreaListByName( "PlayerDropArea"), "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
 
     InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族勇士", "黄盖", 1, 2, 2);
     InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族勇士", "黄盖", 1, 2, 2);
     InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族勇士", "黄盖", 1, 2, 2);
     InitCard(FindCardAreaListByName("EnemyDeckArea"), "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
     InitCard(FindCardAreaListByName("EnemyDeckArea"), "蛮族刺客", "甘宁", 1, 1 ,3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Puncture);
-    
+    InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+
+    bDrawCard = true;
   }
 
 
@@ -93,13 +96,14 @@ public class BattleManager : MonoBehaviour {
   /// <summary>
   /// 初始化角色
   /// </summary>
-  void InitPlayer(Player p,string name,int hp,int cost,bool isplayer)
+  void InitPlayer(Player p,string name,int hp,int cost,bool isplayer,string animname)
   {
     p.m_PlayerName = name;
     p.m_HP = hp;
     p.m_Cost = cost;
     p.m_BattleCardList = new List<Card>();
     p.m_IsPlayer = isplayer;
+    p.InitAnimation(animname);
   }
 
   /// <summary>
@@ -173,39 +177,39 @@ public class BattleManager : MonoBehaviour {
     {
       foreach (Card card in area.m_AreaList)
       {
-        if(!card.m_IsBattleDead)
+        if(card.m_CardType == Card.CardType.Character)
           card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
       }
     }
-    //if (area.m_CardAreaName.Contains("EnemyHand"))
-    //{
-    //  foreach (Card card in area.m_AreaList)
-    //  {
-    //    if (!card.m_IsBattleDead)
-    //      card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
-    //  }
-    //}
+    if (area.m_CardAreaName.Contains("EnemyHand"))
+    {
+      foreach (Card card in area.m_AreaList)
+      {
+        if (card.m_CardType == Card.CardType.Character)
+          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
+      }
+    }
     if (area.m_CardAreaName.Contains("PlayerBattle"))
     {
       foreach (Card card in area.m_AreaList)
       {
-        if (!card.m_IsBattleDead)
+        if (!card.m_IsBattleDead && card.m_CardType == Card.CardType.Character)
           card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
       }
     }
-    //if (area.m_CardAreaName.Contains("EnemyBattle"))
-    //{
-    //  foreach (Card card in area.m_AreaList)
-    //  {
-    //    if (!card.m_IsBattleDead)
-    //      card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
-    //  }
-    //}
+    if (area.m_CardAreaName.Contains("EnemyBattle"))
+    {
+      foreach (Card card in area.m_AreaList)
+      {
+        if (!card.m_IsBattleDead && card.m_CardType == Card.CardType.Character)
+          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
+      }
+    }
   }
 
   void UpdateAICard()
   {
-    for(int i = 0;i < Level; i++)
+    for(int i = 0;i < Level + 1; i++)
     {
       BattleCube cube = FindCardAreaListByName("EnemyBattleArea").transform.GetChild((Random.Range(0,9))).GetComponent<BattleCube>();
       if (cube.transform.childCount == 0)
@@ -217,20 +221,19 @@ public class BattleManager : MonoBehaviour {
         card.m_IsInBattleGround = true;
         card.m_BattleRow = cube.m_Row;
         card.m_BattleColumn = cube.m_Column;
-        FindCardAreaListByName("EnemyBattleArea").m_AreaList.Add(cSelectCard);
+        FindCardAreaListByName("EnemyBattleArea").m_AreaList.Add(card);
       }
     }
   }
 
   void UpdateBattle()
   {
-
-    enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, 0);
-    player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, 0);
-    enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, 1);
-    player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, 1);
-    enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, 2);
-    player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, 2);
+    for (int i = 0; i < 9; i++)
+    {
+      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i / 3, i % 3);
+      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i / 3, i % 3);
+    }
+    
     BattleCalculationDead(FindCardAreaListByName("EnemyBattleArea"),3,3);
     BattleCalculationDead(FindCardAreaListByName("PlayerBattleArea"), 3, 3);
 
@@ -274,18 +277,19 @@ public class BattleManager : MonoBehaviour {
     }
 
     Level++;
+    player.m_CurrentHP += 5;
     enemy.m_PlayerName = "野蛮人 Lv" + Level;
     this.transform.Find("Text_Stage").GetComponent<Text>().text = "Stage 1-" + Level;
     bDrawCard = true;
   }
-  int BattleCalculation(CardArea atkarea,CardArea defarea, int row,int column,int currentcolumn)
+  int BattleCalculation(CardArea atkarea,CardArea defarea, int row,int column,int currentcolumn,int currrentrow)
   {
     int atk = 0;
     Card.HurtEffect hurteffect = Card.HurtEffect.Normal;
     for (int i = 0; i < row * column; i++)
     {
       BattleCube cube = atkarea.transform.GetChild(i).GetComponent<BattleCube>();
-      if (cube != null && cube.m_Column == currentcolumn && cube.transform.childCount > 0)
+      if (cube != null && cube.m_Column == currentcolumn && cube.m_Row == currrentrow && cube.transform.childCount > 0)
       {
         atk += cube.transform.GetChild(0).GetComponent<Card>().m_CurrentATK;
         if (cube.transform.GetChild(0).GetComponent<Card>().m_HurtEffect > hurteffect)
@@ -465,19 +469,28 @@ void UpdateCardAreaListCount(CardArea area)
     {
       player.m_CurrentCost -= cSelectCard.m_Cost;
       cSelectCard.m_IsSelected = false;
+      
       cSelectCard.m_IsInBattleGround = true;
       cSelectCard.gameObject.transform.SetParent(cube.gameObject.transform);
       cSelectCard.gameObject.transform.position = cube.gameObject.transform.position;
       cSelectCard.m_BattleRow = cube.m_Row;
       cSelectCard.m_BattleColumn = cube.m_Column;
-
       CheckSpecial(cSelectCard,FindCardAreaListByName("PlayerBattleArea"));
 
-      FindCardAreaListByName("PlayerBattleArea").m_AreaList.Add(cSelectCard);
-      GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
-      Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
-      card.InitByClone(cSelectCard,this);
-      FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(card);
+      if (cSelectCard.m_CardType == Card.CardType.Character)
+      {
+        FindCardAreaListByName("PlayerBattleArea").m_AreaList.Add(cSelectCard);
+        GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
+        Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
+        card.InitByClone(cSelectCard, this);
+        FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(card);
+      }
+      else
+      {
+        cSelectCard.m_IsInBattleGround = false;
+        cSelectCard.gameObject.transform.SetParent(this.transform.Find("Recycle"));
+        FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(cSelectCard);
+      }
       FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
       cSelectCard = null;
     }
@@ -488,19 +501,12 @@ void UpdateCardAreaListCount(CardArea area)
   {
     if (card.m_CardName == "指挥官")
     {
+      card.m_CurrentATK += area.m_AreaList.Count;
       card.m_CurrentHP += area.m_AreaList.Count;
-    }
-    if (card.m_CardName == "盾手")
-    {
-      card.m_Armor = 2;
-    }
-    if (card.m_CardName == "蛮族勇士")
-    {
-      card.m_Armor = 2;
     }
     foreach (Card forcard in area.m_AreaList)
     {
-      if (card.m_CardName == "冲锋" && forcard.m_CardType == Card.CardType.Character && card.m_BattleColumn == forcard.m_BattleColumn)
+      if (card.m_CardName == "冲锋" && forcard.m_CardType == Card.CardType.Character && (card.m_BattleRow == forcard.m_BattleRow || card.m_BattleColumn == forcard.m_BattleColumn))
       {
         forcard.m_CurrentATK += 2;
       }
@@ -509,13 +515,13 @@ void UpdateCardAreaListCount(CardArea area)
         forcard.m_CurrentATK *= 3;
         forcard.m_CurrentHP = 1;
       }
-      if (card.m_CardName == "坚守" && forcard.m_CardType == Card.CardType.Character && card.m_BattleColumn == forcard.m_BattleColumn)
+      if (card.m_CardName == "坚守" && forcard.m_CardType == Card.CardType.Character && card.m_BattleRow == forcard.m_BattleRow)
       {
-        forcard.m_CurrentArmor *= 2;
+        forcard.m_CurrentHP *= 2;
       }
-      if (card.m_CardName == "巨盾" && forcard.m_CardType == Card.CardType.Character && forcard.m_BattleRow == 0)
+      if (card.m_CardName == "巨盾" && forcard.m_CardType == Card.CardType.Character)
       {
-        forcard.m_CurrentArmor += 4;
+        forcard.m_CurrentHP += 5;
       }
     }
   }

@@ -25,6 +25,8 @@ public class Player : MonoBehaviour {
   public Text m_TextHP;
   public Text m_TextCost;
 
+  public UGUISpriteAnimation animationConfig;
+
   // Use this for initialization
   void Start () {
   }
@@ -38,6 +40,13 @@ public class Player : MonoBehaviour {
     if (m_IsPlayer)
       m_TextCost.text = m_Cost.ToString();
 
+  }
+
+  public void InitAnimation(string animname)
+  {
+    this.animationConfig = this.gameObject.GetComponent<UGUISpriteAnimation>();
+    this.animationConfig.m_SpiteName = animname;
+    this.animationConfig.InitFrame(animname);
   }
 
   public void GetHurt(int damage) {
