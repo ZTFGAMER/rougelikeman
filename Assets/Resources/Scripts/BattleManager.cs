@@ -8,27 +8,22 @@ public class BattleManager : MonoBehaviour {
   public List<CardArea> CardAreaList;
   public Player player;
   public Player enemy;
-
   public bool bDrawCard = true;
   public bool bDropCard = false;
+  public bool bShowAttack = false;
   public int iDrawCardCount = 0;
   public bool bShuffle = false;
   public bool bIsPlayerTurn = true;
   public bool bSelectHandCard = false;
   public Card cSelectCard;
-
-  public int Level = 0;
-
-  // Use this for initialization
+  public int Level = 1;
+  
   void Start() {
 
     InitBattleData();
 
     InitBattleGround();
   }
-  /// <summary>
-  /// 临时数据初始化，后期会通过读表获取
-  /// </summary>
   void InitBattleData()
   {
 
@@ -43,8 +38,8 @@ public class BattleManager : MonoBehaviour {
 
     InitPlayer(player, "圣骑士", 35, 3, true, "曹操(骑马)");
     InitPlayer(enemy, "野蛮人", 30, 3, false, "陆逊");
-    player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
-    enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
+    player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
+    enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
 
     InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵","近卫兵", 1, 3, 3);
     InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵", "近卫兵", 1, 3, 3);
@@ -71,12 +66,6 @@ public class BattleManager : MonoBehaviour {
 
     bDrawCard = true;
   }
-
-
-  /// <summary>
-  /// 初始化几个不同的放卡位置
-  /// </summary>
-  /// <param name="name"></param>
   void InitCardAreaList(string name)
   {
     if (this.transform.Find(name))
@@ -92,10 +81,6 @@ public class BattleManager : MonoBehaviour {
       CardAreaList.Add(cardarea);
     }
   }
-
-  /// <summary>
-  /// 初始化角色
-  /// </summary>
   void InitPlayer(Player p,string name,int hp,int cost,bool isplayer,string animname)
   {
     p.m_PlayerName = name;
@@ -105,10 +90,6 @@ public class BattleManager : MonoBehaviour {
     p.m_IsPlayer = isplayer;
     p.InitAnimation(animname);
   }
-
-  /// <summary>
-  /// 初始化卡牌
-  /// </summary>
   void InitCard(CardArea area, string name,string animname, int cost, int hp = 0,int atk = 0, Card.CardType cardtype = Card.CardType.Character, Card.HurtEffect hurteffect = Card.HurtEffect.Normal)
   {
     GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
@@ -125,7 +106,6 @@ public class BattleManager : MonoBehaviour {
     area.m_AreaList.Add(card);
 
   }
-
   void InitBattleCube(CardArea area, int row = 1, int column = 1)
   {
     for (int i = 0; i < row * column; i++)
@@ -137,9 +117,6 @@ public class BattleManager : MonoBehaviour {
       cube.battlemanager = this;
     }
   }
-  /// <summary>
-  /// 清场，将战斗元素准备好
-  /// </summary>
   void InitBattleGround()
   {
     player.PrepareForBattle();
@@ -147,9 +124,7 @@ public class BattleManager : MonoBehaviour {
     InitBattleCube(FindCardAreaListByName("PlayerBattleArea"),3,3);
     InitBattleCube(FindCardAreaListByName("EnemyBattleArea"),3,3);
   }
-
-	// Update is called once per frame
-	void Update () {
+	public void Tick () {
     if (bDrawCard)
     {
       UpdateAICard();
@@ -157,8 +132,9 @@ public class BattleManager : MonoBehaviour {
     }
     if (bDropCard)
     {
+
       DropCard(FindCardAreaListByName("PlayerDropArea"), FindCardAreaListByName("PlayerDeckArea"), FindCardAreaListByName("PlayerHandArea"));
-      UpdateBattle();
+      StartCoroutine(UpdateBattle());
       
     }
     foreach (CardArea area in CardAreaList)
@@ -167,10 +143,10 @@ public class BattleManager : MonoBehaviour {
     }
     foreach (CardArea area in CardAreaList)
     {
-      UpdateCardAnimation(area);
+      if(!bShowAttack)
+        UpdateCardAnimation(area);
     }
   }
-
   void UpdateCardAnimation(CardArea area)
   {
     if (area.m_CardAreaName.Contains("PlayerHand"))
@@ -194,7 +170,7 @@ public class BattleManager : MonoBehaviour {
       foreach (Card card in area.m_AreaList)
       {
         if (!card.m_IsBattleDead && card.m_CardType == Card.CardType.Character)
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
+          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
       }
     }
     if (area.m_CardAreaName.Contains("EnemyBattle"))
@@ -202,14 +178,13 @@ public class BattleManager : MonoBehaviour {
       foreach (Card card in area.m_AreaList)
       {
         if (!card.m_IsBattleDead && card.m_CardType == Card.CardType.Character)
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
+          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
       }
     }
   }
-
   void UpdateAICard()
   {
-    for(int i = 0;i < Level + 1; i++)
+    for(int i = 0;i < Level; i++)
     {
       BattleCube cube = FindCardAreaListByName("EnemyBattleArea").transform.GetChild((Random.Range(0,9))).GetComponent<BattleCube>();
       if (cube.transform.childCount == 0)
@@ -225,35 +200,103 @@ public class BattleManager : MonoBehaviour {
       }
     }
   }
-
-  void UpdateBattle()
+  IEnumerator UpdateBattle()
   {
-    for (int i = 0; i < 9; i++)
+    bShowAttack = true;
+    for (int i = 0; i < 3; i++)
     {
-      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i / 3, i % 3);
-      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i / 3, i % 3);
+      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 0);
+      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 0);
+      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 1);
+      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 1);
+      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 2);
+      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 2);
+
+      bool hascard = false;
+
+      foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
+      {
+        if (card.m_BattleColumn == i)
+        {
+          hascard = true;
+          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
+        }
+      }
+      foreach (Card card in FindCardAreaListByName("EnemyBattleArea").m_AreaList)
+      {
+        if (card.m_BattleColumn == i)
+        {
+          hascard = true;
+          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
+        }
+      }
+      if (hascard)
+      {
+        yield return new WaitForSeconds(5 / UGUISpriteAnimation.FPS);
+      }
+
+      bool iscarddead = false;
+
+      foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
+      {
+        if (card.m_BattleColumn == i)
+        {
+          if (card.m_IsBattleDead)
+          {
+            iscarddead = true;
+            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+          }
+          else
+          {
+            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
+          }
+        }
+      }
+      foreach (Card card in FindCardAreaListByName("EnemyBattleArea").m_AreaList)
+      {
+        if (card.m_BattleColumn == i)
+        {
+          if (card.m_IsBattleDead)
+          {
+            iscarddead = true;
+            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+          }
+          else
+          {
+            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
+          }
+        }
+      }
+      if (iscarddead)
+      {
+        yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
+      }
+      BattleCalculationDead(FindCardAreaListByName("EnemyBattleArea"), i);
+      BattleCalculationDead(FindCardAreaListByName("PlayerBattleArea"), i);
+      
     }
     
-    BattleCalculationDead(FindCardAreaListByName("EnemyBattleArea"),3,3);
-    BattleCalculationDead(FindCardAreaListByName("PlayerBattleArea"), 3, 3);
 
     if (enemy.m_CurrentHP <= 0)
     {
+      enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+      yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
       NextStage();
     }
 
     if (player.m_CurrentHP <= 0)
     {
+      player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+      yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
       Dead();
     }
+    bShowAttack = false;
     bDrawCard = true;
   }
-
   public void Dead()
   {
     this.transform.Find("BattleEnd").gameObject.SetActive(true);
   }
-
   void NextStage()
   {
     Shuffle(FindCardAreaListByName("PlayerHandArea"), FindCardAreaListByName("PlayerDeckArea"));
@@ -273,13 +316,13 @@ public class BattleManager : MonoBehaviour {
         FindCardAreaListByName("EnemyBattleArea").m_AreaList.Remove(cube2.transform.GetChild(0).gameObject.GetComponent<Card>());
         Destroy(cube2.transform.GetChild(0).gameObject);
       }
-      
     }
 
     Level++;
     player.m_CurrentHP += 5;
     enemy.m_PlayerName = "野蛮人 Lv" + Level;
     this.transform.Find("Text_Stage").GetComponent<Text>().text = "Stage 1-" + Level;
+    enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
     bDrawCard = true;
   }
   int BattleCalculation(CardArea atkarea,CardArea defarea, int row,int column,int currentcolumn,int currrentrow)
@@ -333,12 +376,11 @@ public class BattleManager : MonoBehaviour {
     }
     return atk;
   }
-
-  void BattleCalculationDead(CardArea area,int row,int column)
+  void BattleCalculationDead(CardArea area,int currentcolumn)
   {
-    for (int i = 0; i < row*column; i++)
+    for (int i = 0; i < 3; i++)
     {
-      BattleCube cube = area.transform.GetChild(i).GetComponent<BattleCube>();
+      BattleCube cube = area.transform.GetChild(currentcolumn + i * 3).GetComponent<BattleCube>();
       if (cube.transform.childCount > 0)
       {
         if (cube.transform.GetChild(0).GetComponent<Card>().m_IsBattleDead)
@@ -356,11 +398,7 @@ public class BattleManager : MonoBehaviour {
       }
     }
   }
-/// <summary>
-/// 更新区域显示
-/// </summary>
-/// <param name="area"></param>
-void UpdateCardAreaListCount(CardArea area)
+  void UpdateCardAreaListCount(CardArea area)
   {
     if (area.transform.Find("Text_Count"))
     {
@@ -371,11 +409,6 @@ void UpdateCardAreaListCount(CardArea area)
       }
     }
   }
-
-
-  /// <summary>
-  /// 洗牌
-  /// </summary>
   void Shuffle(CardArea areaout,CardArea areain)
   {
     int countNum = areaout.m_AreaList.Count;
@@ -392,7 +425,6 @@ void UpdateCardAreaListCount(CardArea area)
     UpdateCardAreaListCount(areaout);
     UpdateCardAreaListCount(areain);
   }
-
   void DrawCard(CardArea areadrop, CardArea areadeck, CardArea areahand)
   {
     while (iDrawCardCount < player.m_DrawCardCount)
@@ -417,7 +449,6 @@ void UpdateCardAreaListCount(CardArea area)
     bDrawCard = false;
     iDrawCardCount = 0;
   }
-
   void DropCard(CardArea areadrop, CardArea areadeck, CardArea areahand)
   {
     for(int i = areahand.m_AreaList.Count-1; i >=0; i--)
@@ -429,8 +460,6 @@ void UpdateCardAreaListCount(CardArea area)
     UpdateCardAreaListCount(areadrop);
     bDropCard = false;
   }
-
-
   CardArea FindCardAreaListByName(string name)
   {
     foreach (CardArea area in CardAreaList)
@@ -440,7 +469,6 @@ void UpdateCardAreaListCount(CardArea area)
     }
     return null;
   }
-
   void ChangeCardArea( CardArea areanew, Card card)
   {
     if (!areanew.m_CardAreaName.Contains("Hand"))
@@ -452,10 +480,6 @@ void UpdateCardAreaListCount(CardArea area)
       card.transform.SetParent(areanew.transform);
     }
   }
-
-
-
-
   public void SelectBattleCube(BattleCube cube)
   {
     foreach(Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
@@ -496,7 +520,6 @@ void UpdateCardAreaListCount(CardArea area)
     }
     bSelectHandCard = false;
   }
-
   void CheckSpecial(Card card,CardArea area)
   {
     if (card.m_CardName == "指挥官")
@@ -525,7 +548,6 @@ void UpdateCardAreaListCount(CardArea area)
       }
     }
   }
-
   public void SelectHandCard(Card card)
   {
     foreach (Card forcard in FindCardAreaListByName("PlayerHandArea").m_AreaList)
@@ -539,7 +561,6 @@ void UpdateCardAreaListCount(CardArea area)
     cSelectCard = card;
     bSelectHandCard = true;
   }
-
   public void OnDropButtonClick()
   {
     player.m_CurrentCost = player.m_Cost;
