@@ -53,6 +53,8 @@ public class Card : MonoBehaviour {
   public Text m_TextATK;
   public Text m_TextCost;
   public Text m_TextCardName;
+  public Image m_HpLine;
+  public Image m_AtkLine;
   public GameObject m_ObjectCardSelect;
 
   public UGUISpriteAnimation animationConfig;
@@ -113,14 +115,16 @@ public class Card : MonoBehaviour {
 
   public int GetHurt(int hurt)
   {
-    if (hurt >= m_CurrentArmor + m_CurrentHP)
+    if (hurt >= m_CurrentHP)
     {
       m_IsBattleDead = true;
-      return hurt - m_CurrentArmor - m_CurrentHP;
+      hurt -= m_CurrentHP;
+      m_CurrentHP = 0;
+      return hurt;
     }
     else
     {
-      m_CurrentHP -= Mathf.Max(0, hurt - m_CurrentArmor);
+      m_CurrentHP -= hurt;
       return 0;
     }
   }
@@ -150,6 +154,18 @@ public class Card : MonoBehaviour {
     if (this.gameObject.transform.Find("HandCardAnim/HandCard_Cost"))
     {
       this.gameObject.transform.Find("HandCardAnim/HandCard_Cost").gameObject.SetActive(!m_IsInBattleGround);
+    }
+    if (this.gameObject.transform.Find("HandCardAnim/HandCard_Name"))
+    {
+      this.gameObject.transform.Find("HandCardAnim/HandCard_Name").gameObject.SetActive(!m_IsInBattleGround);
+    }
+    if (this.gameObject.transform.Find("HandCardAnim/HandCard_ATK"))
+    {
+      this.gameObject.transform.Find("HandCardAnim/HandCard_ATK").gameObject.SetActive(!m_IsInBattleGround);
+    }
+    if (this.gameObject.transform.Find("HandCardAnim/HandCard_HP"))
+    {
+      this.gameObject.transform.Find("HandCardAnim/HandCard_HP").gameObject.SetActive(!m_IsInBattleGround);
     }
     if (m_CardType == CardType.Character)
     {
