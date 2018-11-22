@@ -14,7 +14,6 @@ public class BattleManager : MonoBehaviour {
   public int iDrawCardCount = 0;
   public bool bShuffle = false;
   public bool bIsPlayerTurn = true;
-  public bool bSelectHandCard = false;
   public Card cSelectCard;
   public int Level = 1;
   
@@ -95,8 +94,8 @@ public class BattleManager : MonoBehaviour {
     GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
     Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
     card.m_CardName =name;
-    card.m_HP = hp;
-    card.m_ATK = atk;
+    card.ChangeHP(hp);
+    card.ChangeATK(atk);
     card.m_Cost = cost;
     card.m_CardType = cardtype;
     card.m_HurtEffect = hurteffect;
@@ -144,11 +143,16 @@ public class BattleManager : MonoBehaviour {
     foreach (CardArea area in CardAreaList)
     {
       UpdateCardAreaListCount(area);
-    }
-    foreach (CardArea area in CardAreaList)
-    {
-      if(!bShowAttack)
+      if (!bShowAttack)
         UpdateCardAnimation(area);
+      UpdateCardTick(area);
+    }
+  }
+  void UpdateCardTick(CardArea area)
+  {
+    foreach (Card card in area.m_AreaList)
+    {
+      card.Tick();
     }
   }
   void UpdateCardAnimation(CardArea area)
@@ -402,6 +406,65 @@ public class BattleManager : MonoBehaviour {
       }
     }
   }
+  void BattleCalculationPre(CardArea area1, CardArea area2)
+  {
+    int atk = 0;
+    Card.HurtEffect hurteffect = Card.HurtEffect.Normal;
+
+    for (int i = 0; i < 9; i++)
+    {
+      BattleCube cube = area1.transform.GetChild(i).GetComponent<BattleCube>();
+      if (cube != null && cube.m_Column == i / 3 && cube.m_Row == i % 3 && cube.transform.childCount > 0)
+      {
+        atk += cube.transform.GetChild(0).GetComponent<Card>().m_CurrentATK;
+        hurteffect = cube.transform.GetChild(0).GetComponent<Card>().m_HurtEffect;
+        if (hurteffect == Card.HurtEffect.Backstab)
+        {
+          for (int j = 8; j >= 0; j--)
+          {
+            BattleCube cube2 = area2.transform.GetChild(j).GetComponent<BattleCube>();
+            if (cube2 != null && cube2.m_Column == i / 3 && cube2.transform.childCount > 0)
+            {
+              atk = cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
+            }
+          }
+        }
+        else
+        {
+          for (int j = 0; j < 9; j++)
+          {
+            BattleCube cube2 = area2.transform.GetChild(j).GetComponent<BattleCube>();
+            if (cube2 != null && cube2.m_Column == i / 3 && cube2.transform.childCount > 0)
+            {
+              if (hurteffect == Card.HurtEffect.Normal)
+              {
+                atk = cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
+              }
+              //if (hurteffect == Card.HurtEffect.Puncture)
+              //{
+              //  atk = cube.transform.GetChild(0).GetComponent<Card>().GetHurtByPuncture(atk);
+              //}
+              if (hurteffect == Card.HurtEffect.Penetrate)
+              {
+                cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  void ClearCalculationPre(CardArea area1, CardArea area2)
+  {
+    foreach (Card card in area1.m_AreaList)
+    {
+      card.m_CurrentHurt = 0;
+    }
+    foreach (Card card in area2.m_AreaList)
+    {
+      card.m_CurrentHurt = 0;
+    }
+  }
   void UpdateCardAreaListCount(CardArea area)
   {
     if (area.transform.Find("Text_Count"))
@@ -505,9 +568,6 @@ public class BattleManager : MonoBehaviour {
       cSelectCard.m_IsInBattleGround = true;
       cSelectCard.gameObject.transform.SetParent(cube.gameObject.transform);
       cSelectCard.gameObject.transform.position = cube.gameObject.transform.position;
-      cSelectCard.m_BattleRow = cube.m_Row;
-      cSelectCard.m_BattleColumn = cube.m_Column;
-      CheckSpecial(cSelectCard,FindCardAreaListByName("PlayerBattleArea"));
 
       if (cSelectCard.m_CardType == Card.CardType.Character)
       {
@@ -523,10 +583,15 @@ public class BattleManager : MonoBehaviour {
         cSelectCard.gameObject.transform.SetParent(this.transform.Find("Recycle"));
         FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(cSelectCard);
       }
+      cSelectCard.m_BattleRow = cube.m_Row;
+      cSelectCard.m_BattleColumn = cube.m_Column;
+      CheckSpecial(cSelectCard, FindCardAreaListByName("PlayerBattleArea"));
       FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
       cSelectCard = null;
+      ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
+      BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
+      BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"));
     }
-    bSelectHandCard = false;
   }
   void CheckSpecial(Card card,CardArea area)
   {
@@ -534,25 +599,32 @@ public class BattleManager : MonoBehaviour {
     {
       card.m_CurrentATK += area.m_AreaList.Count;
       card.m_CurrentHP += area.m_AreaList.Count;
+      card.ChangeHP(area.m_AreaList.Count);
+      card.ChangeATK(area.m_AreaList.Count);
     }
     foreach (Card forcard in area.m_AreaList)
     {
       if (card.m_CardName == "冲锋" && forcard.m_CardType == Card.CardType.Character && (card.m_BattleRow == forcard.m_BattleRow || card.m_BattleColumn == forcard.m_BattleColumn))
       {
         forcard.m_CurrentATK += 2;
+        forcard.ChangeATK(2);
       }
       if (card.m_CardName == "爆发" && forcard.m_CardType == Card.CardType.Character && card.m_BattleColumn == forcard.m_BattleColumn)
       {
         forcard.m_CurrentATK *= 3;
         forcard.m_CurrentHP = 1;
+        forcard.ChangeHP(1 - forcard.m_HP);
+        forcard.ChangeATK(forcard.m_ATK * 2);
       }
       if (card.m_CardName == "坚守" && forcard.m_CardType == Card.CardType.Character && card.m_BattleRow == forcard.m_BattleRow)
       {
         forcard.m_CurrentHP *= 2;
+        forcard.ChangeHP(forcard.m_HP);
       }
       if (card.m_CardName == "巨盾" && forcard.m_CardType == Card.CardType.Character)
       {
         forcard.m_CurrentHP += 5;
+        forcard.ChangeHP(5);
       }
     }
   }
@@ -567,7 +639,6 @@ public class BattleManager : MonoBehaviour {
     }
     card.m_IsSelected = true;
     cSelectCard = card;
-    bSelectHandCard = true;
   }
   public void OnDropButtonClick()
   {
