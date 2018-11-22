@@ -114,6 +114,10 @@ public class BattleManager : MonoBehaviour {
       BattleCube cube = Instantiate(toInstantiate, area.transform).GetComponent<BattleCube>();
       cube.m_Row = i / column;
       cube.m_Column = i % column;
+      if (area.m_CardAreaName.Contains("Player"))
+      {
+        cube.m_IsPlayer = true;
+      }
       cube.battlemanager = this;
     }
   }
@@ -482,6 +486,10 @@ public class BattleManager : MonoBehaviour {
   }
   public void SelectBattleCube(BattleCube cube)
   {
+    if (!cube.m_IsPlayer)
+    {
+      return;
+    }
     foreach(Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
     {
       if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)

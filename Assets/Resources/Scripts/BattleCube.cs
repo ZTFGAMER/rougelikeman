@@ -7,6 +7,7 @@ public class BattleCube : MonoBehaviour {
 
   public int m_Row;
   public int m_Column;
+  public bool m_IsPlayer = false;
   public BattleManager battlemanager;
   // Use this for initialization
   void Start () {
