@@ -40,28 +40,28 @@ public class BattleManager : MonoBehaviour {
     player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
     enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
 
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵","近卫兵", 1, 3, 3);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵", "近卫兵", 1, 3, 3);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "士兵", "近卫兵", 1, 3, 3);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "弓箭手", "黄忠(骑马)", 1, 1, 5);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "盾手", "曹仁", 1, 5, 1);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "盾手", "曹仁", 1, 5, 1);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "盾手", "曹仁", 1, 5, 1);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "指挥官", "夏侯敦(骑马)", 2, 2, 2);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
-    InitCard(FindCardAreaListByName( "PlayerDropArea"), "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false,"士兵","近卫兵", 1, 3, 3);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "指挥官", "夏侯敦(骑马)", 2, 2, 2);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
 
-    InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族勇士", "黄盖", 1, 2, 2);
-    InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族勇士", "黄盖", 1, 2, 2);
-    InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族勇士", "黄盖", 1, 2, 2);
-    InitCard(FindCardAreaListByName("EnemyDeckArea"), "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    InitCard(FindCardAreaListByName("EnemyDeckArea"), "蛮族刺客", "甘宁", 1, 1 ,3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    InitCard(FindCardAreaListByName( "EnemyDeckArea"), "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1 ,3, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
 
     bDrawCard = true;
   }
@@ -75,6 +75,7 @@ public class BattleManager : MonoBehaviour {
       }
       CardArea cardarea = this.transform.Find(name).GetComponent<CardArea>();
       cardarea.m_CardAreaName = name;
+      cardarea.battlemanager = this;
       UpdateCardAreaListCount(cardarea);
       cardarea.m_AreaList = new List<Card>();
       CardAreaList.Add(cardarea);
@@ -88,22 +89,6 @@ public class BattleManager : MonoBehaviour {
     p.m_BattleCardList = new List<Card>();
     p.m_IsPlayer = isplayer;
     p.InitAnimation(animname);
-  }
-  void InitCard(CardArea area, string name,string animname, int cost, int hp = 0,int atk = 0, Card.CardType cardtype = Card.CardType.Character, Card.HurtEffect hurteffect = Card.HurtEffect.Normal)
-  {
-    GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
-    Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
-    card.m_CardName =name;
-    card.ChangeHP(hp);
-    card.ChangeATK(atk);
-    card.m_Cost = cost;
-    card.m_CardType = cardtype;
-    card.m_HurtEffect = hurteffect;
-    card.InitAnimation(animname);
-    card.battleManager = this;
-    card.PrepareForBattle();
-    area.m_AreaList.Add(card);
-
   }
   void InitBattleCube(CardArea area, int row = 1, int column = 1)
   {
@@ -147,6 +132,8 @@ public class BattleManager : MonoBehaviour {
         UpdateCardAnimation(area);
       UpdateCardTick(area);
     }
+    player.Tick();
+    enemy.Tick();
   }
   void UpdateCardTick(CardArea area)
   {
@@ -200,13 +187,16 @@ public class BattleManager : MonoBehaviour {
         GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
         Card card = Instantiate(toInstantiate, cube.transform).GetComponent<Card>();
         card.gameObject.transform.position = cube.gameObject.transform.position;
-        card.InitByClone(FindCardAreaListByName("EnemyDeckArea").m_AreaList[Random.Range(0, FindCardAreaListByName("EnemyDeckArea").m_AreaList.Count)],this);
+        card.InitByClone(FindCardAreaListByName("EnemyDeckArea").m_AreaList[Random.Range(0, FindCardAreaListByName("EnemyDeckArea").m_AreaList.Count)]);
         card.m_IsInBattleGround = true;
         card.m_BattleRow = cube.m_Row;
         card.m_BattleColumn = cube.m_Column;
         FindCardAreaListByName("EnemyBattleArea").m_AreaList.Add(card);
       }
     }
+    ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
+    enemy.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
+    player.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"));
   }
   IEnumerator UpdateBattle()
   {
@@ -220,6 +210,7 @@ public class BattleManager : MonoBehaviour {
       enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 2);
       player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 2);
 
+      ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"),false, false,i);
       bool hascard = false;
 
       foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
@@ -281,9 +272,8 @@ public class BattleManager : MonoBehaviour {
       }
       BattleCalculationDead(FindCardAreaListByName("EnemyBattleArea"), i);
       BattleCalculationDead(FindCardAreaListByName("PlayerBattleArea"), i);
-      
+
     }
-    
 
     if (enemy.m_CurrentHP <= 0)
     {
@@ -381,6 +371,10 @@ public class BattleManager : MonoBehaviour {
           }
         }
       }
+      if (hurteffect == Card.HurtEffect.Penetrate)
+      {
+        atk = 0;
+      }
     }
     return atk;
   }
@@ -406,15 +400,15 @@ public class BattleManager : MonoBehaviour {
       }
     }
   }
-  void BattleCalculationPre(CardArea area1, CardArea area2)
+  int BattleCalculationPre(CardArea area1, CardArea area2)
   {
-    int atk = 0;
-    Card.HurtEffect hurteffect = Card.HurtEffect.Normal;
-
+    int atk2 = 0;
     for (int i = 0; i < 9; i++)
     {
+      int atk = 0;
+      Card.HurtEffect hurteffect = Card.HurtEffect.Normal;
       BattleCube cube = area1.transform.GetChild(i).GetComponent<BattleCube>();
-      if (cube != null && cube.m_Column == i / 3 && cube.m_Row == i % 3 && cube.transform.childCount > 0)
+      if (cube != null && cube.transform.childCount > 0)
       {
         atk += cube.transform.GetChild(0).GetComponent<Card>().m_CurrentATK;
         hurteffect = cube.transform.GetChild(0).GetComponent<Card>().m_HurtEffect;
@@ -423,7 +417,7 @@ public class BattleManager : MonoBehaviour {
           for (int j = 8; j >= 0; j--)
           {
             BattleCube cube2 = area2.transform.GetChild(j).GetComponent<BattleCube>();
-            if (cube2 != null && cube2.m_Column == i / 3 && cube2.transform.childCount > 0)
+            if (cube2 != null && cube2.m_Column == cube.m_Column && cube2.transform.childCount > 0)
             {
               atk = cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
             }
@@ -434,7 +428,7 @@ public class BattleManager : MonoBehaviour {
           for (int j = 0; j < 9; j++)
           {
             BattleCube cube2 = area2.transform.GetChild(j).GetComponent<BattleCube>();
-            if (cube2 != null && cube2.m_Column == i / 3 && cube2.transform.childCount > 0)
+            if (cube2 != null && cube2.m_Column == cube.m_Column && cube2.transform.childCount > 0)
             {
               if (hurteffect == Card.HurtEffect.Normal)
               {
@@ -451,18 +445,36 @@ public class BattleManager : MonoBehaviour {
             }
           }
         }
+        cube.transform.GetChild(0).GetComponent<Card>().GetHurtAPra(atk);
       }
+      atk2 += atk;
     }
+    return atk2;
   }
-  void ClearCalculationPre(CardArea area1, CardArea area2)
+  void ClearCalculationPre(CardArea area1, CardArea area2,bool isplayer = true,bool ishurta = true,int column = 3)
   {
+    if(isplayer)
+    { 
+      player.m_CurrentHurt = 0;
+      enemy.m_CurrentHurt = 0;
+    }
     foreach (Card card in area1.m_AreaList)
     {
-      card.m_CurrentHurt = 0;
+      if(column == 3 || card.m_BattleColumn == column)
+      {
+        card.m_CurrentHurt = 0;
+        if(ishurta)
+          card.m_CurrentHurtA = 0;
+      }
     }
     foreach (Card card in area2.m_AreaList)
     {
-      card.m_CurrentHurt = 0;
+      if (column == 3 || card.m_BattleColumn == column)
+      {
+        card.m_CurrentHurt = 0;
+        if (ishurta)
+          card.m_CurrentHurtA = 0;
+      }
     }
   }
   void UpdateCardAreaListCount(CardArea area)
@@ -574,7 +586,7 @@ public class BattleManager : MonoBehaviour {
         FindCardAreaListByName("PlayerBattleArea").m_AreaList.Add(cSelectCard);
         GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
         Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
-        card.InitByClone(cSelectCard, this);
+        card.InitByClone(cSelectCard);
         FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(card);
       }
       else
@@ -589,8 +601,8 @@ public class BattleManager : MonoBehaviour {
       FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
       cSelectCard = null;
       ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-      BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-      BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"));
+      enemy.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
+      player.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"));
     }
   }
   void CheckSpecial(Card card,CardArea area)

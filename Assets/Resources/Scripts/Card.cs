@@ -50,6 +50,7 @@ public class Card : MonoBehaviour {
   public int m_CurrentArmor;
   public int m_CurrentOrder;
   public int m_CurrentHurt = 0;
+  public int m_CurrentHurtA = 0;
   public Text m_TextHP;
   public Text m_TextATK;
   public Text m_TextCost;
@@ -57,6 +58,7 @@ public class Card : MonoBehaviour {
   public GameObject m_HPLine;
   public GameObject m_ATKLine;
   public GameObject m_ObjectCardSelect;
+  public bool m_IsEnemy;
 
   public UGUISpriteAnimation animationConfig;
 
@@ -66,25 +68,37 @@ public class Card : MonoBehaviour {
   void Start() {
 
   }
-  public void InitByClone(Card clonecard, BattleManager battlem)
+  public void InitByClone(Card clonecard)
   {
+    this.battleManager = clonecard.battleManager;
+    m_IsEnemy = clonecard.m_IsEnemy;
+    ChangeHPAndATKLine();
     m_CardName = clonecard.m_CardName;
+    m_HurtEffect = clonecard.m_HurtEffect;
     ChangeHP(clonecard.m_HP);
     ChangeATK(clonecard.m_ATK);
     m_Cost = clonecard.m_Cost;
     m_CurrentHurt = 0;
+    m_CurrentHurtA = 0;
     m_CardType = clonecard.m_CardType;
-    m_HurtEffect = clonecard.m_HurtEffect;
     InitAnimation(clonecard.animationConfig.m_SpiteName);
-    this.battleManager = battlem;
     PrepareForBattle();
+  }
+  public void ChangeHPAndATKLine()
+  {
+    if (m_IsEnemy)
+    {
+      GameObject tochange = m_HPLine;
+      m_HPLine = m_ATKLine;
+      m_ATKLine = tochange;
+    }
   }
   public void ChangeHP(int delta)
   {
     m_HP = Mathf.Max(0,m_HP + delta);
     if (delta != 0)
     {
-      ChangeCardLine(m_HPLine, m_HP, delta);
+      ChangeCardLine(m_HPLine, m_HP, delta,"defence_icon_01");
     }
   }
   public void ChangeATK(int delta)
@@ -92,10 +106,24 @@ public class Card : MonoBehaviour {
     m_ATK = Mathf.Max(0, m_ATK + delta);
     if (delta != 0)
     {
-      ChangeCardLine(m_ATKLine, m_ATK, delta);
+      switch (m_HurtEffect)
+      {
+        case HurtEffect.Normal:
+          ChangeCardLine(m_ATKLine, m_ATK, delta, "attack_icon_01");
+          break;
+        case HurtEffect.Backstab:
+          ChangeCardLine(m_ATKLine, m_ATK, delta, "attack_icon_02");
+          break;
+        case HurtEffect.Penetrate:
+          ChangeCardLine(m_ATKLine, m_ATK, delta, "attack_icon_03");
+          break;
+        default:
+          ChangeCardLine(m_ATKLine, m_ATK, delta, "attack_icon_01");
+          break;
+      }
     }
   }
-  void ChangeCardLine(GameObject line, int total, int delta)
+  void ChangeCardLine(GameObject line, int total, int delta,string image)
   {
     if (delta == 0)
     {
@@ -106,14 +134,35 @@ public class Card : MonoBehaviour {
       for (int i = 0; i < delta; i++)
       {
         GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HPLine");
-        Instantiate(toInstantiate, line.transform.Find("TotalContent"));
+        GameObject hpline = Instantiate(toInstantiate, line.transform);
+        hpline.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/" + image);
       }
     }
-    else if(delta <= total)
+    else
     {
       for (int i = 0; i > delta; i--)
       {
-        Destroy(line.transform.Find("TotalContent").GetChild(0).gameObject);
+        Destroy(line.transform.GetChild(0).gameObject);
+      }
+    }
+    UpdateCardLinePosition(line);
+  }
+  void UpdateCardLinePosition(GameObject line)
+  {
+    int enemy = 1;
+    if (m_IsEnemy)
+    {
+      enemy = -1;
+    }
+    for (int i = 0; i < line.transform.childCount; i++)
+    {
+      if (line.transform.childCount < 4)
+      {
+        line.transform.GetChild(i).position = new Vector3(line.transform.position.x, line.transform.position.y - 55 * enemy + enemy * (line.transform.childCount - 1 - i) * 40f);
+      }
+      else
+      {
+        line.transform.GetChild(i).position = new Vector3(line.transform.position.x, line.transform.position.y + 55 * enemy - enemy * i * 110f / (line.transform.childCount - 1));
       }
     }
   }
@@ -148,16 +197,27 @@ public class Card : MonoBehaviour {
   }
   public int GetHurtPre(int hurt)
   {
-    if (hurt >= m_CurrentHP)
+    if (hurt >= m_CurrentHP - m_CurrentHurt)
     {
-      hurt -= m_CurrentHP;
-      m_CurrentHurt += m_CurrentHP;
+      hurt -= m_CurrentHP - m_CurrentHurt;
+      m_CurrentHurt = m_CurrentHP;
       return hurt;
     }
     else
     {
       m_CurrentHurt += hurt;
       return 0;
+    }
+  }
+  public void GetHurtAPra(int hurt)
+  {
+    if (hurt <= m_CurrentATK)
+    {
+      m_CurrentHurtA = m_CurrentATK - hurt;
+    }
+    else
+    {
+      m_CurrentHurtA = 0;
     }
   }
   public int GetHurt(int hurt)
@@ -194,29 +254,27 @@ public class Card : MonoBehaviour {
     ShowCard();
     if (m_IsInBattleGround)
     { 
-      UpdateCardLine(m_HPLine, m_HP, m_CurrentHP,m_CurrentHurt,Color.red,Color.green,Color.yellow);
-      //UpdateCardLine(m_ATKLine, m_ATK, m_CurrentATK,Color.red,Color.red);
+      UpdateCardLine(m_HPLine, m_HP, m_CurrentHP,m_CurrentHurt,Color.green, Color.gray,Color.yellow);
+      UpdateCardLine(m_ATKLine, m_ATK, m_CurrentATK, m_CurrentHurtA, Color.red,Color.gray, Color.yellow);
     }
   }
   void UpdateCardLine(GameObject line, int total, int delta,int hurt,Color totalc,Color deltac,Color hurtc)
   {
     if (total > 0)
     {
-      line.transform.Find("TotalContent").GetComponent<GridLayoutGroup>().cellSize = new Vector2(20f, 150f / total);
       for (int i = 0; i < total; i++)
       {
-
-        if (i < delta - hurt)
+        if (delta < total && i < total - delta)
         {
-          line.transform.Find("TotalContent").GetChild(total - i - 1).GetComponent<Image>().color = deltac;
+          line.transform.GetChild(i).GetComponent<Image>().color = deltac;
         }
-        else if (i < delta)
+        else if (hurt > 0 && i < total - delta + hurt)
         {
-          line.transform.Find("TotalContent").GetChild(total - i - 1).GetComponent<Image>().color = hurtc;
+          line.transform.GetChild(i).GetComponent<Image>().color = hurtc;
         }
         else
         {
-          line.transform.Find("TotalContent").GetChild(total - i - 1).GetComponent<Image>().color = totalc;
+          line.transform.GetChild(i).GetComponent<Image>().color = totalc;
         }
       }
     }
@@ -233,10 +291,10 @@ public class Card : MonoBehaviour {
     {
       this.gameObject.transform.Find("HandCardAnim/HandCard_Name").gameObject.SetActive(!m_IsInBattleGround);
     }
-    //if (this.gameObject.transform.Find("HandCardAnim/HandCard_ATK"))
-    //{
-    //  this.gameObject.transform.Find("HandCardAnim/HandCard_ATK").gameObject.SetActive(!m_IsInBattleGround);
-    //}
+    if (this.gameObject.transform.Find("HandCardAnim/HandCard_ATK"))
+    {
+      this.gameObject.transform.Find("HandCardAnim/HandCard_ATK").gameObject.SetActive(!m_IsInBattleGround);
+    }
     if (this.gameObject.transform.Find("HandCardAnim/HandCard_HP"))
     {
       this.gameObject.transform.Find("HandCardAnim/HandCard_HP").gameObject.SetActive(!m_IsInBattleGround);
@@ -247,8 +305,7 @@ public class Card : MonoBehaviour {
     }
     if (m_ATKLine != null)
     {
-      //m_ATKLine.SetActive(m_IsInBattleGround);
-      m_ATKLine.SetActive(false);
+      m_ATKLine.SetActive(m_IsInBattleGround);
     }
     if (m_CardType == CardType.Character)
     {

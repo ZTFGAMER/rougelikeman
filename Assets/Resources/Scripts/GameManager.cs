@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
 
   public static GameManager instance = null;
   public BattleManager battlemanager;
-  public static float FPS = 10f;
+  public static float FPS = 30f;
 
   private float deltaTime = 0f;
      

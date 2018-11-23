@@ -16,6 +16,7 @@ public class Player : MonoBehaviour {
   public int m_Cost;
   public int m_CurrentHP;
   public int m_CurrentCost;
+  public int m_CurrentHurt;
   public int m_DrawCardCount = 5;
   public bool m_IsAlive;
   public bool m_IsPlayer;
@@ -24,6 +25,8 @@ public class Player : MonoBehaviour {
   public Text m_TextName;
   public Text m_TextHP;
   public Text m_TextCost;
+  private GameObject m_CurrentHPLine;
+  private GameObject m_CurrentHurtLine;
 
   public UGUISpriteAnimation animationConfig;
 
@@ -39,7 +42,8 @@ public class Player : MonoBehaviour {
     m_TextHP.text = m_HP.ToString();
     if (m_IsPlayer)
       m_TextCost.text = m_Cost.ToString();
-
+    m_CurrentHPLine = m_TextHP.transform.parent.Find("Current_HP").gameObject;
+    m_CurrentHurtLine = m_TextHP.transform.parent.Find("Current_Hurt").gameObject;
   }
 
   public void InitAnimation(string animname)
@@ -67,15 +71,27 @@ public class Player : MonoBehaviour {
   }
 
 	// Update is called once per frame
-	void Update () {
-    
+	public void Tick () {
+    DrawHPLine();
     UpdateData();
+  }
+
+  void DrawHPLine()
+  {
+    if (m_HP > 0)
+    { 
+      m_CurrentHurtLine.GetComponent<RectTransform>().sizeDelta = new Vector2(Mathf.Max((float)m_CurrentHurt,(float)m_CurrentHP) / (float)m_HP * 200f, 40f);
+      m_CurrentHPLine.GetComponent<RectTransform>().sizeDelta = new Vector2((float)m_CurrentHP / (float)m_HP * 200f, 40f);
+      m_CurrentHPLine.transform.position = new Vector3(m_CurrentHPLine.transform.parent.position.x - (1f - (float)m_CurrentHP / (float)m_HP) * 100f, m_CurrentHPLine.transform.parent.position.y);
+    }
+    if (m_CurrentHP > 0)
+      m_CurrentHurtLine.transform.position = new Vector3(m_CurrentHPLine.transform.position.x + (1f - (float)m_CurrentHurt / (float)m_CurrentHP) * ((float)m_CurrentHP / (float)m_HP) * 100f, m_CurrentHPLine.transform.position.y);
   }
 
   void UpdateData()
   {
     m_TextName.text = m_PlayerName;
-    m_TextHP.text = m_CurrentHP.ToString();
+    m_TextHP.text = m_CurrentHP.ToString() + "/" + m_HP.ToString();
     if (m_IsPlayer)
       m_TextCost.text = m_CurrentCost.ToString()+"/" +m_Cost.ToString();
   }
