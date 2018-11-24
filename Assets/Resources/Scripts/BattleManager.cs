@@ -195,20 +195,20 @@ public class BattleManager : MonoBehaviour {
       }
     }
     ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-    enemy.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-    player.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"));
+    enemy.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea")));
+    player.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea")));
   }
   IEnumerator UpdateBattle()
   {
     bShowAttack = true;
     for (int i = 0; i < 3; i++)
     {
-      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 0);
-      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 0);
-      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 1);
-      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 1);
-      enemy.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 2);
-      player.m_CurrentHP -= BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 2);
+      enemy.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 0));
+      player.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 0));
+      enemy.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 1));
+      player.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 1));
+      enemy.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 2));
+      player.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 2));
 
       ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"),false, false,i);
       bool hascard = false;
@@ -317,7 +317,7 @@ public class BattleManager : MonoBehaviour {
     }
 
     Level++;
-    player.m_CurrentHP += 5;
+    player.SetCurrentHP(10);
     enemy.m_PlayerName = "野蛮人 Lv" + Level;
     this.transform.Find("Text_Stage").GetComponent<Text>().text = "Stage 1-" + Level;
     enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
@@ -443,6 +443,10 @@ public class BattleManager : MonoBehaviour {
                 cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
               }
             }
+          }
+          if (hurteffect == Card.HurtEffect.Penetrate)
+          {
+            atk = 0;
           }
         }
         cube.transform.GetChild(0).GetComponent<Card>().GetHurtAPra(atk);
@@ -601,8 +605,8 @@ public class BattleManager : MonoBehaviour {
       FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
       cSelectCard = null;
       ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-      enemy.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-      player.m_CurrentHurt += BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"));
+      enemy.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea")));
+      player.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea")));
     }
   }
   void CheckSpecial(Card card,CardArea area)

@@ -142,7 +142,7 @@ public class Card : MonoBehaviour {
     {
       for (int i = 0; i > delta; i--)
       {
-        Destroy(line.transform.GetChild(0).gameObject);
+        Destroy(line.transform.GetChild(-i).gameObject);
       }
     }
     UpdateCardLinePosition(line);

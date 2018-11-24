@@ -52,35 +52,28 @@ public class Player : MonoBehaviour {
     this.animationConfig.m_SpiteName = animname;
     this.animationConfig.InitFrame(animname);
   }
-
-  public void GetHurt(int damage) {
-    if (m_HP <= damage)
-    {
-      m_IsAlive = false;
-      m_HP = 0;
-    }
-    else
-    {
-      m_HP -= damage;
-    }
-  }
-
   public void EndTurn()
   {
     m_Cost = Constant.PLAYER_ENERGY;
   }
-
 	// Update is called once per frame
 	public void Tick () {
     DrawHPLine();
     UpdateData();
   }
-
+  public void SetCurrentHurt(int hurt)
+  {
+    m_CurrentHurt = Mathf.Min(m_CurrentHurt + hurt,m_CurrentHP);
+  }
+  public void SetCurrentHP(int hp)
+  {
+    m_CurrentHP = Mathf.Min(m_CurrentHP + hp, m_HP);
+  }  
   void DrawHPLine()
   {
     if (m_HP > 0)
     { 
-      m_CurrentHurtLine.GetComponent<RectTransform>().sizeDelta = new Vector2(Mathf.Max((float)m_CurrentHurt,(float)m_CurrentHP) / (float)m_HP * 200f, 40f);
+      m_CurrentHurtLine.GetComponent<RectTransform>().sizeDelta = new Vector2(Mathf.Min((float)m_CurrentHurt,(float)m_CurrentHP) / (float)m_HP * 200f, 40f);
       m_CurrentHPLine.GetComponent<RectTransform>().sizeDelta = new Vector2((float)m_CurrentHP / (float)m_HP * 200f, 40f);
       m_CurrentHPLine.transform.position = new Vector3(m_CurrentHPLine.transform.parent.position.x - (1f - (float)m_CurrentHP / (float)m_HP) * 100f, m_CurrentHPLine.transform.parent.position.y);
     }
