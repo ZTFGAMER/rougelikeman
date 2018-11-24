@@ -9,6 +9,7 @@ public class BattleManager : MonoBehaviour {
   public Player player;
   public Player enemy;
   public bool bDrawCard = true;
+  public bool bPushCard = false;
   public bool bDropCard = false;
   public bool bShowAttack = false;
   public int iDrawCardCount = 0;
@@ -120,7 +121,6 @@ public class BattleManager : MonoBehaviour {
     }
     if (bDropCard)
     {
-
       DropCard(FindCardAreaListByName("PlayerDropArea"), FindCardAreaListByName("PlayerDeckArea"), FindCardAreaListByName("PlayerHandArea"));
       StartCoroutine(UpdateBattle());
       
@@ -530,10 +530,12 @@ public class BattleManager : MonoBehaviour {
     }
     UpdateCardAreaListCount(areadeck);
     bDrawCard = false;
+    bPushCard = true;
     iDrawCardCount = 0;
   }
   void DropCard(CardArea areadrop, CardArea areadeck, CardArea areahand)
   {
+    bPushCard = false;
     for(int i = areahand.m_AreaList.Count-1; i >=0; i--)
     {
       ChangeCardArea(areadrop, areahand.m_AreaList[i]);
@@ -563,53 +565,7 @@ public class BattleManager : MonoBehaviour {
       card.transform.SetParent(areanew.transform);
     }
   }
-  public void SelectBattleCube(BattleCube cube)
-  {
-    if (!cube.m_IsPlayer)
-    {
-      return;
-    }
-    foreach(Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
-    {
-      if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
-      {
-        return;
-      }
-    }
-    if (cSelectCard != null && player.m_CurrentCost >= cSelectCard.m_Cost)
-    {
-      player.m_CurrentCost -= cSelectCard.m_Cost;
-      cSelectCard.m_IsSelected = false;
-      
-      cSelectCard.m_IsInBattleGround = true;
-      cSelectCard.gameObject.transform.SetParent(cube.gameObject.transform);
-      cSelectCard.gameObject.transform.position = cube.gameObject.transform.position;
-
-      if (cSelectCard.m_CardType == Card.CardType.Character)
-      {
-        FindCardAreaListByName("PlayerBattleArea").m_AreaList.Add(cSelectCard);
-        GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
-        Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
-        card.InitByClone(cSelectCard);
-        FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(card);
-      }
-      else
-      {
-        cSelectCard.m_IsInBattleGround = false;
-        cSelectCard.gameObject.transform.SetParent(this.transform.Find("Recycle"));
-        FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(cSelectCard);
-      }
-      cSelectCard.m_BattleRow = cube.m_Row;
-      cSelectCard.m_BattleColumn = cube.m_Column;
-      CheckSpecial(cSelectCard, FindCardAreaListByName("PlayerBattleArea"));
-      FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
-      cSelectCard = null;
-      ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-      enemy.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea")));
-      player.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea")));
-    }
-  }
-  void CheckSpecial(Card card,CardArea area)
+  void CheckSpecial(Card card, CardArea area)
   {
     if (card.m_CardName == "指挥官")
     {
@@ -644,21 +600,76 @@ public class BattleManager : MonoBehaviour {
       }
     }
   }
-  public void SelectHandCard(Card card)
+  public void SelectBattleCube(BattleCube cube)
   {
-    foreach (Card forcard in FindCardAreaListByName("PlayerHandArea").m_AreaList)
+    if (bPushCard)
     {
-      if (forcard != card)
+      if (!cube.m_IsPlayer)
       {
-        forcard.m_IsSelected = false;
+        return;
+      }
+      foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
+      {
+        if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
+        {
+          return;
+        }
+      }
+      if (cSelectCard != null && player.m_CurrentCost >= cSelectCard.m_Cost)
+      {
+        player.m_CurrentCost -= cSelectCard.m_Cost;
+        cSelectCard.m_IsSelected = false;
+
+        cSelectCard.m_IsInBattleGround = true;
+        cSelectCard.gameObject.transform.SetParent(cube.gameObject.transform);
+        cSelectCard.gameObject.transform.position = cube.gameObject.transform.position;
+
+        if (cSelectCard.m_CardType == Card.CardType.Character)
+        {
+          FindCardAreaListByName("PlayerBattleArea").m_AreaList.Add(cSelectCard);
+          GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
+          Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
+          card.InitByClone(cSelectCard);
+          FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(card);
+        }
+        else
+        {
+          cSelectCard.m_IsInBattleGround = false;
+          cSelectCard.gameObject.transform.SetParent(this.transform.Find("Recycle"));
+          FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(cSelectCard);
+        }
+        cSelectCard.m_BattleRow = cube.m_Row;
+        cSelectCard.m_BattleColumn = cube.m_Column;
+        CheckSpecial(cSelectCard, FindCardAreaListByName("PlayerBattleArea"));
+        FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
+        cSelectCard = null;
+        ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
+        enemy.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea")));
+        player.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea")));
       }
     }
-    card.m_IsSelected = true;
-    cSelectCard = card;
+  }
+  public void SelectHandCard(Card card)
+  {
+    if (bPushCard)
+    {
+      foreach (Card forcard in FindCardAreaListByName("PlayerHandArea").m_AreaList)
+      {
+        if (forcard != card)
+        {
+          forcard.m_IsSelected = false;
+        }
+      }
+      card.m_IsSelected = true;
+      cSelectCard = card;
+    }
   }
   public void OnDropButtonClick()
   {
-    player.m_CurrentCost = player.m_Cost;
-    bDropCard = true;
+    if(bPushCard)
+    { 
+      player.m_CurrentCost = player.m_Cost;
+      bDropCard = true;
+    }
   }
 }
