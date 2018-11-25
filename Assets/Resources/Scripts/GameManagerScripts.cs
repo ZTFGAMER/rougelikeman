@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManagerScripts : MonoBehaviour {
 
-  public static GameManager instance = null;
+  public static GameManagerScripts instance = null;
   public BattleManager battlemanager;
   public static float FPS = 30f;
 
@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
   void InitGame()
   {
     GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/BattleManager");
-    battlemanager = Instantiate(toInstantiate,this.transform.Find("Canvas")).GetComponent<BattleManager>();
+    battlemanager = Instantiate(toInstantiate,GameObject.Find("Canvas").transform).GetComponent<BattleManager>();
   }
 
 	// Update is called once per frame
