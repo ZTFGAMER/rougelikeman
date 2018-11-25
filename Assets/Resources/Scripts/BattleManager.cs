@@ -96,6 +96,7 @@ public class BattleManager : MonoBehaviour {
     p.m_Cost = cost;
     p.m_BattleCardList = new List<Card>();
     p.m_IsPlayer = isplayer;
+    p.battleManager = this;
     p.InitAnimation(animname);
   }
   void InitBattleCube(CardArea area, int row = 1, int column = 1)

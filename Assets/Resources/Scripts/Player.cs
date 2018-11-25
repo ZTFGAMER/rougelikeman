@@ -27,6 +27,7 @@ public class Player : MonoBehaviour {
   public Text m_TextCost;
   private GameObject m_CurrentHPLine;
   private GameObject m_CurrentHurtLine;
+  public BattleManager battleManager;
 
   public UGUISpriteAnimation animationConfig;
 
@@ -73,14 +74,15 @@ public class Player : MonoBehaviour {
   }  
   void DrawHPLine()
   {
+    float scale = battleManager.transform.parent.localScale.x;
     if (m_HP > 0)
     { 
       m_CurrentHurtLine.GetComponent<RectTransform>().sizeDelta = new Vector2(Mathf.Min((float)m_CurrentHurt,(float)m_CurrentHP) / (float)m_HP * 200f, 40f);
       m_CurrentHPLine.GetComponent<RectTransform>().sizeDelta = new Vector2((float)m_CurrentHP / (float)m_HP * 200f, 40f);
-      m_CurrentHPLine.transform.position = new Vector3(m_CurrentHPLine.transform.parent.position.x - (1f - (float)m_CurrentHP / (float)m_HP) * 100f, m_CurrentHPLine.transform.parent.position.y);
+      m_CurrentHPLine.transform.position = new Vector3(m_CurrentHPLine.transform.parent.position.x - (1f - (float)m_CurrentHP / (float)m_HP) * scale* 100f, m_CurrentHPLine.transform.parent.position.y);
     }
     if (m_CurrentHP > 0)
-      m_CurrentHurtLine.transform.position = new Vector3(m_CurrentHPLine.transform.position.x + (1f - (float)m_CurrentHurt / (float)m_CurrentHP) * ((float)m_CurrentHP / (float)m_HP) * 100f, m_CurrentHPLine.transform.position.y);
+      m_CurrentHurtLine.transform.position = new Vector3(m_CurrentHPLine.transform.position.x + (1f - (float)m_CurrentHurt / (float)m_CurrentHP) * ((float)m_CurrentHP / (float)m_HP) * scale * 100f, m_CurrentHPLine.transform.position.y);
   }
 
   void UpdateData()
