@@ -27,7 +27,6 @@ public class Card : MonoBehaviour {
     Puncture = 4,//无视护盾造成伤害
     Penetrate = 8,//贯穿，对所有排上的敌人造成伤害
   };
-
   public string m_CardName;
   public int m_HP = 0;
   public int m_Cost;

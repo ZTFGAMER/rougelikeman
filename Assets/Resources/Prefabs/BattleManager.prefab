@@ -3617,26 +3617,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d6b37d20110b746b81834a0ec571bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CardAreaList:
-  - {fileID: 114816451728686818}
-  - {fileID: 114250681748749252}
-  - {fileID: 114771516577761896}
-  - {fileID: 114097307181493886}
-  - {fileID: 114995255603944118}
-  - {fileID: 114829376679772536}
-  - {fileID: 114560277094909998}
-  - {fileID: 114762880892521806}
-  - {fileID: 114816451728686818}
-  - {fileID: 114250681748749252}
-  - {fileID: 114771516577761896}
-  - {fileID: 114097307181493886}
-  - {fileID: 114995255603944118}
-  - {fileID: 114829376679772536}
-  - {fileID: 114560277094909998}
-  - {fileID: 114762880892521806}
+  CardAreaList: []
   player: {fileID: 114144296863167398}
   enemy: {fileID: 114278837911397232}
   bDrawCard: 0
+  bPushCard: 0
   bDropCard: 0
   bShowAttack: 0
   iDrawCardCount: 0

@@ -16,7 +16,7 @@ public class CardArea : MonoBehaviour {
   public void InitCard(bool isenemy,string name, string animname, int cost, int hp = 0, int atk = 0, Card.CardType cardtype = Card.CardType.Character, Card.HurtEffect hurteffect = Card.HurtEffect.Normal)
   {
     GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
-    Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
+    Card card = Instantiate(toInstantiate, battlemanager.transform.Find("Recycle")).GetComponent<Card>();
     card.battleManager = battlemanager;
     card.m_IsEnemy = isenemy;
     card.ChangeHPAndATKLine();

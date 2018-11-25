@@ -41,28 +41,35 @@ public class BattleManager : MonoBehaviour {
     player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
     enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
 
-    FindCardAreaListByName("PlayerDropArea").InitCard(false,"士兵","近卫兵", 1, 3, 3);
     FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "指挥官", "夏侯敦(骑马)", 2, 2, 2);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
-    FindCardAreaListByName( "PlayerDropArea").InitCard(false, "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "指挥官", "夏侯敦(骑马)", 2, 2, 2);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
+    FindCardAreaListByName("PlayerDropArea").InitCard(false, "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
 
-    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
-    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
-    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
     FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1 ,3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName( "EnemyDeckArea").InitCard(true, "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
+    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+
+    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾士", "曹仁", 1, 6, 1);
+    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 3);
+    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "战士", "近卫兵", 1, 3, 2);
+    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "术士", "谋士", 1, 2, 0);
+    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "弩车", "运输兵", 2, 3, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "刺客", "甘宁", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Backstab);
 
     bDrawCard = true;
   }
@@ -317,7 +324,7 @@ public class BattleManager : MonoBehaviour {
     }
 
     Level++;
-    player.SetCurrentHP(10);
+    player.SetCurrentHP(10,false);
     enemy.m_PlayerName = "野蛮人 Lv" + Level;
     this.transform.Find("Text_Stage").GetComponent<Text>().text = "Stage 1-" + Level;
     enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);

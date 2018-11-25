@@ -65,8 +65,10 @@ public class Player : MonoBehaviour {
   {
     m_CurrentHurt = Mathf.Min(m_CurrentHurt + hurt,m_CurrentHP);
   }
-  public void SetCurrentHP(int hp)
+  public void SetCurrentHP(int hp, bool changehurt = true)
   {
+    if(changehurt)
+      m_CurrentHurt = Mathf.Min(m_CurrentHurt + hp, m_CurrentHP);
     m_CurrentHP = Mathf.Min(m_CurrentHP + hp, m_HP);
   }  
   void DrawHPLine()
