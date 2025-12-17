@@ -1,683 +1,676 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BattleManager : MonoBehaviour {
+/// <summary>
+/// 战斗管理器（重构版）- 作为协调者管理各个系统
+/// Battle Manager (Refactored) - Coordinates all systems
+/// </summary>
+public class BattleManager : MonoBehaviour
+{
+    // 系统引用 / System References
+    private CardSystem cardSystem;
+    private BattleCalculator battleCalculator;
+    private AIController aiController;
+    private TurnManager turnManager;
+    private SpecialEffectManager specialEffectManager;
 
-  public List<CardArea> CardAreaList;
-  public Player player;
-  public Player enemy;
-  public bool bDrawCard = true;
-  public bool bPushCard = false;
-  public bool bDropCard = false;
-  public bool bShowAttack = false;
-  public int iDrawCardCount = 0;
-  public bool bShuffle = false;
-  public bool bIsPlayerTurn = true;
-  public Card cSelectCard;
-  public int Level = 1;
-  
-  void Start() {
+    // 玩家和敌人 / Player and Enemy
+    public Player player;
+    public Player enemy;
 
-    InitBattleData();
+    // 状态标志 / State Flags
+    public bool bDrawCard = true;
+    public bool bPushCard = false;
+    public bool bDropCard = false;
+    public bool bShowAttack = false;
+    public int iDrawCardCount = 0;
+    public Card cSelectCard;
+    public int Level = 1;
 
-    InitBattleGround();
-  }
-  void InitBattleData()
-  {
+    // 卡牌区域名称常量 / Card Area Name Constants
+    private const string PLAYER_HAND_AREA = "PlayerHandArea";
+    private const string PLAYER_BATTLE_AREA = "PlayerBattleArea";
+    private const string PLAYER_DECK_AREA = "PlayerDeckArea";
+    private const string PLAYER_DROP_AREA = "PlayerDropArea";
+    private const string ENEMY_HAND_AREA = "EnemyHandArea";
+    private const string ENEMY_BATTLE_AREA = "EnemyBattleArea";
+    private const string ENEMY_DECK_AREA = "EnemyDeckArea";
+    private const string ENEMY_DROP_AREA = "EnemyDropArea";
 
-    InitCardAreaList("PlayerHandArea");
-    InitCardAreaList("EnemyHandArea");
-    InitCardAreaList("PlayerBattleArea");
-    InitCardAreaList("EnemyBattleArea");
-    InitCardAreaList("PlayerDeckArea");
-    InitCardAreaList("EnemyDeckArea");
-    InitCardAreaList("PlayerDropArea");
-    InitCardAreaList("EnemyDropArea");
+    void Start()
+    {
+        InitializeSystems();
+        InitBattleData();
+        InitBattleGround();
+    }
 
-    InitPlayer(player, "圣骑士", 35, 3, true, "曹操(骑马)");
-    InitPlayer(enemy, "野蛮人", 30, 3, false, "陆逊");
-    player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
-    enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
+    /// <summary>
+    /// 初始化所有系统
+    /// Initialize all systems
+    /// </summary>
+    void InitializeSystems()
+    {
+        Transform recycleTransform = this.transform.Find("Recycle") ?? this.transform;
 
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "士兵", "近卫兵", 1, 3, 3);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾手", "曹仁", 1, 5, 1);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "指挥官", "夏侯敦(骑马)", 2, 2, 2);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
-    FindCardAreaListByName("PlayerDropArea").InitCard(false, "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
+        cardSystem = new CardSystem(recycleTransform);
+        battleCalculator = new BattleCalculator();
+        turnManager = new TurnManager();
+        specialEffectManager = new SpecialEffectManager();
+    }
 
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
-    FindCardAreaListByName("EnemyDeckArea").InitCard(true, "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+    /// <summary>
+    /// 初始化战斗数据
+    /// Initialize battle data
+    /// </summary>
+    void InitBattleData()
+    {
+        // 初始化卡牌区域
+        InitCardAreaList(PLAYER_HAND_AREA);
+        InitCardAreaList(ENEMY_HAND_AREA);
+        InitCardAreaList(PLAYER_BATTLE_AREA);
+        InitCardAreaList(ENEMY_BATTLE_AREA);
+        InitCardAreaList(PLAYER_DECK_AREA);
+        InitCardAreaList(ENEMY_DECK_AREA);
+        InitCardAreaList(PLAYER_DROP_AREA);
+        InitCardAreaList(ENEMY_DROP_AREA);
 
-    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "盾士", "曹仁", 1, 6, 1);
-    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 3);
-    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "战士", "近卫兵", 1, 3, 2);
-    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "术士", "谋士", 1, 2, 0);
-    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "弩车", "运输兵", 2, 3, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
-    //FindCardAreaListByName("PlayerDropArea").InitCard(false, "刺客", "甘宁", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Backstab);
+        // 初始化AI控制器
+        aiController = new AIController(
+            cardSystem.GetCardArea(ENEMY_BATTLE_AREA),
+            cardSystem.GetCardArea(ENEMY_DECK_AREA)
+        );
 
-    bDrawCard = true;
-  }
-  void InitCardAreaList(string name)
-  {
-    if (this.transform.Find(name))
-    {
-      if (!this.transform.Find(name).GetComponent<CardArea>())
-      {
-        this.transform.Find(name).gameObject.AddComponent<CardArea>();
-      }
-      CardArea cardarea = this.transform.Find(name).GetComponent<CardArea>();
-      cardarea.m_CardAreaName = name;
-      cardarea.battlemanager = this;
-      UpdateCardAreaListCount(cardarea);
-      cardarea.m_AreaList = new List<Card>();
-      CardAreaList.Add(cardarea);
-    }
-  }
-  void InitPlayer(Player p,string name,int hp,int cost,bool isplayer,string animname)
-  {
-    p.m_PlayerName = name;
-    p.m_HP = hp;
-    p.m_Cost = cost;
-    p.m_BattleCardList = new List<Card>();
-    p.m_IsPlayer = isplayer;
-    p.battleManager = this;
-    p.InitAnimation(animname);
-  }
-  void InitBattleCube(CardArea area, int row = 1, int column = 1)
-  {
-    for (int i = 0; i < row * column; i++)
-    {
-      GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/BattleCube");
-      BattleCube cube = Instantiate(toInstantiate, area.transform).GetComponent<BattleCube>();
-      cube.m_Row = i / column;
-      cube.m_Column = i % column;
-      if (area.m_CardAreaName.Contains("Player"))
-      {
-        cube.m_IsPlayer = true;
-      }
-      cube.battlemanager = this;
-    }
-  }
-  void InitBattleGround()
-  {
-    player.PrepareForBattle();
-    enemy.PrepareForBattle();
-    InitBattleCube(FindCardAreaListByName("PlayerBattleArea"),3,3);
-    InitBattleCube(FindCardAreaListByName("EnemyBattleArea"),3,3);
-  }
-	public void Tick () {
-    if (bDrawCard)
-    {
-      UpdateAICard();
-      DrawCard(FindCardAreaListByName("PlayerDropArea"), FindCardAreaListByName( "PlayerDeckArea"), FindCardAreaListByName( "PlayerHandArea"));
-    }
-    if (bDropCard)
-    {
-      DropCard(FindCardAreaListByName("PlayerDropArea"), FindCardAreaListByName("PlayerDeckArea"), FindCardAreaListByName("PlayerHandArea"));
-      StartCoroutine(UpdateBattle());
-      
-    }
-    foreach (CardArea area in CardAreaList)
-    {
-      UpdateCardAreaListCount(area);
-      if (!bShowAttack)
-        UpdateCardAnimation(area);
-      UpdateCardTick(area);
-    }
-    player.Tick();
-    enemy.Tick();
-  }
-  void UpdateCardTick(CardArea area)
-  {
-    foreach (Card card in area.m_AreaList)
-    {
-      card.Tick();
-    }
-  }
-  void UpdateCardAnimation(CardArea area)
-  {
-    if (area.m_CardAreaName.Contains("PlayerHand"))
-    {
-      foreach (Card card in area.m_AreaList)
-      {
-        if(card.m_CardType == Card.CardType.Character)
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
-      }
-    }
-    if (area.m_CardAreaName.Contains("EnemyHand"))
-    {
-      foreach (Card card in area.m_AreaList)
-      {
-        if (card.m_CardType == Card.CardType.Character)
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
-      }
-    }
-    if (area.m_CardAreaName.Contains("PlayerBattle"))
-    {
-      foreach (Card card in area.m_AreaList)
-      {
-        if (!card.m_IsBattleDead && card.m_CardType == Card.CardType.Character)
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
-      }
-    }
-    if (area.m_CardAreaName.Contains("EnemyBattle"))
-    {
-      foreach (Card card in area.m_AreaList)
-      {
-        if (!card.m_IsBattleDead && card.m_CardType == Card.CardType.Character)
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
-      }
-    }
-  }
-  void UpdateAICard()
-  {
-    for(int i = 0;i < Level; i++)
-    {
-      BattleCube cube = FindCardAreaListByName("EnemyBattleArea").transform.GetChild((Random.Range(0,9))).GetComponent<BattleCube>();
-      if (cube.transform.childCount == 0)
-      {
-        GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
-        Card card = Instantiate(toInstantiate, cube.transform).GetComponent<Card>();
-        card.gameObject.transform.position = cube.gameObject.transform.position;
-        card.InitByClone(FindCardAreaListByName("EnemyDeckArea").m_AreaList[Random.Range(0, FindCardAreaListByName("EnemyDeckArea").m_AreaList.Count)]);
-        card.m_IsInBattleGround = true;
-        card.m_BattleRow = cube.m_Row;
-        card.m_BattleColumn = cube.m_Column;
-        FindCardAreaListByName("EnemyBattleArea").m_AreaList.Add(card);
-      }
-    }
-    ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-    enemy.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea")));
-    player.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea")));
-  }
-  IEnumerator UpdateBattle()
-  {
-    bShowAttack = true;
-    for (int i = 0; i < 3; i++)
-    {
-      enemy.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 0));
-      player.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 0));
-      enemy.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 1));
-      player.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 1));
-      enemy.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"), 3, 3, i, 2));
-      player.SetCurrentHP(-BattleCalculation(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea"), 3, 3, i, 2));
+        // 初始化玩家和敌人
+        InitPlayer(player, "圣骑士", 35, 3, true, "曹操(骑马)");
+        InitPlayer(enemy, "野蛮人", 30, 3, false, "陆逊");
+        player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
+        enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
 
-      ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"),false, false,i);
-      bool hascard = false;
+        // 初始化玩家卡组
+        InitializePlayerDeck();
 
-      foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
-      {
-        if (card.m_BattleColumn == i)
+        // 初始化敌人卡组
+        InitializeEnemyDeck();
+
+        bDrawCard = true;
+    }
+
+    /// <summary>
+    /// 初始化卡牌区域列表
+    /// Initialize card area list
+    /// </summary>
+    void InitCardAreaList(string name)
+    {
+        Transform areaTransform = this.transform.Find(name);
+        if (areaTransform)
         {
-          hascard = true;
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
-        }
-      }
-      foreach (Card card in FindCardAreaListByName("EnemyBattleArea").m_AreaList)
-      {
-        if (card.m_BattleColumn == i)
-        {
-          hascard = true;
-          card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
-        }
-      }
-      if (hascard)
-      {
-        yield return new WaitForSeconds(5 / UGUISpriteAnimation.FPS);
-      }
-
-      bool iscarddead = false;
-
-      foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
-      {
-        if (card.m_BattleColumn == i)
-        {
-          if (card.m_IsBattleDead)
-          {
-            iscarddead = true;
-            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
-          }
-          else
-          {
-            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
-          }
-        }
-      }
-      foreach (Card card in FindCardAreaListByName("EnemyBattleArea").m_AreaList)
-      {
-        if (card.m_BattleColumn == i)
-        {
-          if (card.m_IsBattleDead)
-          {
-            iscarddead = true;
-            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
-          }
-          else
-          {
-            card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
-          }
-        }
-      }
-      if (iscarddead)
-      {
-        yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
-      }
-      BattleCalculationDead(FindCardAreaListByName("EnemyBattleArea"), i);
-      BattleCalculationDead(FindCardAreaListByName("PlayerBattleArea"), i);
-
-    }
-
-    if (enemy.m_CurrentHP <= 0)
-    {
-      enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
-      yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
-      NextStage();
-    }
-
-    if (player.m_CurrentHP <= 0)
-    {
-      player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
-      yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
-      Dead();
-    }
-    bShowAttack = false;
-    bDrawCard = true;
-  }
-  public void Dead()
-  {
-    this.transform.Find("BattleEnd").gameObject.SetActive(true);
-  }
-  void NextStage()
-  {
-    Shuffle(FindCardAreaListByName("PlayerHandArea"), FindCardAreaListByName("PlayerDeckArea"));
-    Shuffle(FindCardAreaListByName("PlayerDropArea"), FindCardAreaListByName("PlayerDeckArea"));
-    enemy.m_CurrentHP = enemy.m_HP;
-    for (int i = 0; i < 3 * 3; i++)
-    {
-      BattleCube cube1 = FindCardAreaListByName("PlayerBattleArea").transform.GetChild(i).GetComponent<BattleCube>();
-      BattleCube cube2 = FindCardAreaListByName("EnemyBattleArea").transform.GetChild(i).GetComponent<BattleCube>();
-      if (cube1 != null && cube1.transform.childCount > 0)
-      {
-        FindCardAreaListByName("PlayerBattleArea").m_AreaList.Remove(cube1.transform.GetChild(0).gameObject.GetComponent<Card>());
-        Destroy(cube1.transform.GetChild(0).gameObject);
-      }
-      if (cube2 != null && cube2.transform.childCount > 0)
-      {
-        FindCardAreaListByName("EnemyBattleArea").m_AreaList.Remove(cube2.transform.GetChild(0).gameObject.GetComponent<Card>());
-        Destroy(cube2.transform.GetChild(0).gameObject);
-      }
-    }
-
-    Level++;
-    player.SetCurrentHP(10,false);
-    enemy.m_PlayerName = "野蛮人 Lv" + Level;
-    this.transform.Find("Text_Stage").GetComponent<Text>().text = "Stage 1-" + Level;
-    enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
-    bDrawCard = true;
-  }
-  int BattleCalculation(CardArea atkarea,CardArea defarea, int row,int column,int currentcolumn,int currrentrow)
-  {
-    int atk = 0;
-    Card.HurtEffect hurteffect = Card.HurtEffect.Normal;
-    for (int i = 0; i < row * column; i++)
-    {
-      BattleCube cube = atkarea.transform.GetChild(i).GetComponent<BattleCube>();
-      if (cube != null && cube.m_Column == currentcolumn && cube.m_Row == currrentrow && cube.transform.childCount > 0)
-      {
-        atk += cube.transform.GetChild(0).GetComponent<Card>().m_CurrentATK;
-        if (cube.transform.GetChild(0).GetComponent<Card>().m_HurtEffect > hurteffect)
-        {
-          hurteffect = cube.transform.GetChild(0).GetComponent<Card>().m_HurtEffect;
-        }
-      }
-    }
-    if (hurteffect == Card.HurtEffect.Backstab)
-    {
-      for (int i = row * column - 1; i >= 0; i--)
-      {
-        BattleCube cube = defarea.transform.GetChild(i).GetComponent<BattleCube>();
-        if (cube != null && cube.m_Column == currentcolumn && cube.transform.childCount > 0)
-        {
-          atk = cube.transform.GetChild(0).GetComponent<Card>().GetHurt(atk);
-        }
-      }
-    }
-    else
-    {
-      for (int i = 0; i < row * column; i++)
-      {
-        BattleCube cube = defarea.transform.GetChild(i).GetComponent<BattleCube>();
-        if (cube != null && cube.m_Column == currentcolumn && cube.transform.childCount > 0)
-        {
-          if (hurteffect == Card.HurtEffect.Normal)
-          {
-            atk = cube.transform.GetChild(0).GetComponent<Card>().GetHurt(atk);
-          }
-          if (hurteffect == Card.HurtEffect.Puncture)
-          {
-            atk = cube.transform.GetChild(0).GetComponent<Card>().GetHurtByPuncture(atk);
-          }
-          if (hurteffect == Card.HurtEffect.Penetrate)
-          {
-            cube.transform.GetChild(0).GetComponent<Card>().GetHurt(atk);
-          }
-        }
-      }
-      if (hurteffect == Card.HurtEffect.Penetrate)
-      {
-        atk = 0;
-      }
-    }
-    return atk;
-  }
-  void BattleCalculationDead(CardArea area,int currentcolumn)
-  {
-    for (int i = 0; i < 3; i++)
-    {
-      BattleCube cube = area.transform.GetChild(currentcolumn + i * 3).GetComponent<BattleCube>();
-      if (cube.transform.childCount > 0)
-      {
-        if (cube.transform.GetChild(0).GetComponent<Card>().m_IsBattleDead)
-        {
-          //if (cube.transform.GetChild(0).GetComponent<Card>().m_DeadAnimTime < UGUISpriteAnimation.FRAMEBASE / UGUISpriteAnimation.FPS)
-          //{
-          //  cube.transform.GetChild(0).GetComponent<Card>().m_DeadAnimTime += Time.deltaTime;
-          //}
-          //else
-          //{ 
-            area.m_AreaList.Remove(cube.transform.GetChild(0).gameObject.GetComponent<Card>());
-            Destroy(cube.transform.GetChild(0).gameObject);
-          //}
-        }
-      }
-    }
-  }
-  int BattleCalculationPre(CardArea area1, CardArea area2)
-  {
-    int atk2 = 0;
-    for (int i = 0; i < 9; i++)
-    {
-      int atk = 0;
-      Card.HurtEffect hurteffect = Card.HurtEffect.Normal;
-      BattleCube cube = area1.transform.GetChild(i).GetComponent<BattleCube>();
-      if (cube != null && cube.transform.childCount > 0)
-      {
-        atk += cube.transform.GetChild(0).GetComponent<Card>().m_CurrentATK;
-        hurteffect = cube.transform.GetChild(0).GetComponent<Card>().m_HurtEffect;
-        if (hurteffect == Card.HurtEffect.Backstab)
-        {
-          for (int j = 8; j >= 0; j--)
-          {
-            BattleCube cube2 = area2.transform.GetChild(j).GetComponent<BattleCube>();
-            if (cube2 != null && cube2.m_Column == cube.m_Column && cube2.transform.childCount > 0)
+            CardArea cardArea = areaTransform.GetComponent<CardArea>();
+            if (!cardArea)
             {
-              atk = cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
+                cardArea = areaTransform.gameObject.AddComponent<CardArea>();
             }
-          }
-        }
-        else
-        {
-          for (int j = 0; j < 9; j++)
-          {
-            BattleCube cube2 = area2.transform.GetChild(j).GetComponent<BattleCube>();
-            if (cube2 != null && cube2.m_Column == cube.m_Column && cube2.transform.childCount > 0)
+
+            cardArea.m_CardAreaName = name;
+            cardArea.battlemanager = this;
+            cardArea.m_AreaList = new List<Card>();
+
+            // 更新计数显示
+            if (areaTransform.Find("Text_Count"))
             {
-              if (hurteffect == Card.HurtEffect.Normal)
-              {
-                atk = cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
-              }
-              //if (hurteffect == Card.HurtEffect.Puncture)
-              //{
-              //  atk = cube.transform.GetChild(0).GetComponent<Card>().GetHurtByPuncture(atk);
-              //}
-              if (hurteffect == Card.HurtEffect.Penetrate)
-              {
-                cube2.transform.GetChild(0).GetComponent<Card>().GetHurtPre(atk);
-              }
+                cardArea.m_TextCount = areaTransform.Find("Text_Count").GetComponent<Text>();
             }
-          }
-          if (hurteffect == Card.HurtEffect.Penetrate)
-          {
-            atk = 0;
-          }
-        }
-        cube.transform.GetChild(0).GetComponent<Card>().GetHurtAPra(atk);
-      }
-      atk2 += atk;
-    }
-    return atk2;
-  }
-  void ClearCalculationPre(CardArea area1, CardArea area2,bool isplayer = true,bool ishurta = true,int column = 3)
-  {
-    if(isplayer)
-    { 
-      player.m_CurrentHurt = 0;
-      enemy.m_CurrentHurt = 0;
-    }
-    foreach (Card card in area1.m_AreaList)
-    {
-      if(column == 3 || card.m_BattleColumn == column)
-      {
-        card.m_CurrentHurt = 0;
-        if(ishurta)
-          card.m_CurrentHurtA = 0;
-      }
-    }
-    foreach (Card card in area2.m_AreaList)
-    {
-      if (column == 3 || card.m_BattleColumn == column)
-      {
-        card.m_CurrentHurt = 0;
-        if (ishurta)
-          card.m_CurrentHurtA = 0;
-      }
-    }
-  }
-  void UpdateCardAreaListCount(CardArea area)
-  {
-    if (area.transform.Find("Text_Count"))
-    {
-      if (area.transform.Find("Text_Count").GetComponent<Text>())
-      {
-        area.m_TextCount = area.transform.Find("Text_Count").GetComponent<Text>();
-        area.m_TextCount.text = area.m_AreaList.Count.ToString();
-      }
-    }
-  }
-  void Shuffle(CardArea areaout,CardArea areain)
-  {
-    int countNum = areaout.m_AreaList.Count;
-    while (countNum > areain.m_AreaList.Count)
-    {
-      int index = Random.Range(0, areaout.m_AreaList.Count);
-      if (!areain.m_AreaList.Contains(areaout.m_AreaList[index]))
-      {
-        ChangeCardArea(areain, areaout.m_AreaList[index]);
-        areain.m_AreaList.Add(areaout.m_AreaList[index]);
-        areaout.m_AreaList.Remove(areaout.m_AreaList[index]);
-      }
-    }
-    UpdateCardAreaListCount(areaout);
-    UpdateCardAreaListCount(areain);
-  }
-  void DrawCard(CardArea areadrop, CardArea areadeck, CardArea areahand)
-  {
-    while (iDrawCardCount < player.m_DrawCardCount)
-    {
-      if (areadeck.m_AreaList.Count == 0)
-      {
-        Shuffle(areadrop, areadeck);
-      }
-      if (areadeck.m_AreaList.Count >= 1)
-      {
-        ChangeCardArea(areahand, areadeck.m_AreaList[0]);
-        areahand.m_AreaList.Add(areadeck.m_AreaList[0]);
-        areadeck.m_AreaList.Remove(areadeck.m_AreaList[0]);
-        iDrawCardCount++;
-      }
-      else
-      {
-        return;
-      }
-    }
-    UpdateCardAreaListCount(areadeck);
-    bDrawCard = false;
-    bPushCard = true;
-    iDrawCardCount = 0;
-  }
-  void DropCard(CardArea areadrop, CardArea areadeck, CardArea areahand)
-  {
-    bPushCard = false;
-    for(int i = areahand.m_AreaList.Count-1; i >=0; i--)
-    {
-      ChangeCardArea(areadrop, areahand.m_AreaList[i]);
-      areadrop.m_AreaList.Add(areahand.m_AreaList[i]);
-      areahand.m_AreaList.Remove(areahand.m_AreaList[i]);
-    }
-    UpdateCardAreaListCount(areadrop);
-    bDropCard = false;
-  }
-  CardArea FindCardAreaListByName(string name)
-  {
-    foreach (CardArea area in CardAreaList)
-    {
-      if (area.m_CardAreaName == name)
-        return area;
-    }
-    return null;
-  }
-  void ChangeCardArea( CardArea areanew, Card card)
-  {
-    if (!areanew.m_CardAreaName.Contains("Hand"))
-    {
-      card.transform.SetParent(this.transform.Find("Recycle"));
-    }
-    else
-    {
-      card.transform.SetParent(areanew.transform);
-    }
-  }
-  void CheckSpecial(Card card, CardArea area)
-  {
-    if (card.m_CardName == "指挥官")
-    {
-      card.m_CurrentATK += area.m_AreaList.Count;
-      card.m_CurrentHP += area.m_AreaList.Count;
-      card.ChangeHP(area.m_AreaList.Count);
-      card.ChangeATK(area.m_AreaList.Count);
-    }
-    foreach (Card forcard in area.m_AreaList)
-    {
-      if (card.m_CardName == "冲锋" && forcard.m_CardType == Card.CardType.Character && (card.m_BattleRow == forcard.m_BattleRow || card.m_BattleColumn == forcard.m_BattleColumn))
-      {
-        forcard.m_CurrentATK += 2;
-        forcard.ChangeATK(2);
-      }
-      if (card.m_CardName == "爆发" && forcard.m_CardType == Card.CardType.Character && card.m_BattleColumn == forcard.m_BattleColumn)
-      {
-        forcard.m_CurrentATK *= 3;
-        forcard.m_CurrentHP = 1;
-        forcard.ChangeHP(1 - forcard.m_HP);
-        forcard.ChangeATK(forcard.m_ATK * 2);
-      }
-      if (card.m_CardName == "坚守" && forcard.m_CardType == Card.CardType.Character && card.m_BattleRow == forcard.m_BattleRow)
-      {
-        forcard.m_CurrentHP *= 2;
-        forcard.ChangeHP(forcard.m_HP);
-      }
-      if (card.m_CardName == "巨盾" && forcard.m_CardType == Card.CardType.Character)
-      {
-        forcard.m_CurrentHP += 5;
-        forcard.ChangeHP(5);
-      }
-    }
-  }
-  public void SelectBattleCube(BattleCube cube)
-  {
-    if (bPushCard)
-    {
-      if (!cube.m_IsPlayer)
-      {
-        return;
-      }
-      foreach (Card card in FindCardAreaListByName("PlayerBattleArea").m_AreaList)
-      {
-        if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
-        {
-          return;
-        }
-      }
-      if (cSelectCard != null && player.m_CurrentCost >= cSelectCard.m_Cost)
-      {
-        player.m_CurrentCost -= cSelectCard.m_Cost;
-        cSelectCard.m_IsSelected = false;
 
-        cSelectCard.m_IsInBattleGround = true;
-        cSelectCard.gameObject.transform.SetParent(cube.gameObject.transform);
-        cSelectCard.gameObject.transform.position = cube.gameObject.transform.position;
+            cardSystem.RegisterCardArea(name, cardArea);
+        }
+    }
 
-        if (cSelectCard.m_CardType == Card.CardType.Character)
-        {
-          FindCardAreaListByName("PlayerBattleArea").m_AreaList.Add(cSelectCard);
-          GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
-          Card card = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
-          card.InitByClone(cSelectCard);
-          FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(card);
-        }
-        else
-        {
-          cSelectCard.m_IsInBattleGround = false;
-          cSelectCard.gameObject.transform.SetParent(this.transform.Find("Recycle"));
-          FindCardAreaListByName("PlayerDropArea").m_AreaList.Add(cSelectCard);
-        }
-        cSelectCard.m_BattleRow = cube.m_Row;
-        cSelectCard.m_BattleColumn = cube.m_Column;
-        CheckSpecial(cSelectCard, FindCardAreaListByName("PlayerBattleArea"));
-        FindCardAreaListByName("PlayerHandArea").m_AreaList.Remove(cSelectCard);
-        cSelectCard = null;
-        ClearCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea"));
-        enemy.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("PlayerBattleArea"), FindCardAreaListByName("EnemyBattleArea")));
-        player.SetCurrentHurt(BattleCalculationPre(FindCardAreaListByName("EnemyBattleArea"), FindCardAreaListByName("PlayerBattleArea")));
-      }
-    }
-  }
-  public void SelectHandCard(Card card)
-  {
-    if (bPushCard)
+    /// <summary>
+    /// 初始化玩家
+    /// Initialize player
+    /// </summary>
+    void InitPlayer(Player p, string name, int hp, int cost, bool isplayer, string animname)
     {
-      foreach (Card forcard in FindCardAreaListByName("PlayerHandArea").m_AreaList)
-      {
-        if (forcard != card)
+        p.m_PlayerName = name;
+        p.m_HP = hp;
+        p.m_Cost = cost;
+        p.m_BattleCardList = new List<Card>();
+        p.m_IsPlayer = isplayer;
+        p.battleManager = this;
+        p.InitAnimation(animname);
+    }
+
+    /// <summary>
+    /// 初始化玩家卡组
+    /// Initialize player deck
+    /// </summary>
+    void InitializePlayerDeck()
+    {
+        CardArea dropArea = cardSystem.GetCardArea(PLAYER_DROP_AREA);
+
+        // 添加士兵卡
+        for (int i = 0; i < 3; i++)
         {
-          forcard.m_IsSelected = false;
+            dropArea.InitCard(false, "士兵", "近卫兵", 1, 3, 3);
         }
-      }
-      card.m_IsSelected = true;
-      cSelectCard = card;
+
+        // 添加弓箭手卡
+        for (int i = 0; i < 3; i++)
+        {
+            dropArea.InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+        }
+
+        // 添加盾手卡
+        for (int i = 0; i < 3; i++)
+        {
+            dropArea.InitCard(false, "盾手", "曹仁", 1, 5, 1);
+        }
+
+        // 添加冲击手卡
+        dropArea.InitCard(false, "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
+
+        // 添加指挥官卡
+        dropArea.InitCard(false, "指挥官", "夏侯敦(骑马)", 2, 2, 2);
+
+        // 添加魔法卡
+        dropArea.InitCard(false, "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
+        dropArea.InitCard(false, "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
+        dropArea.InitCard(false, "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
+        dropArea.InitCard(false, "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
     }
-  }
-  public void OnDropButtonClick()
-  {
-    if(bPushCard)
-    { 
-      player.m_CurrentCost = player.m_Cost;
-      bDropCard = true;
+
+    /// <summary>
+    /// 初始化敌人卡组
+    /// Initialize enemy deck
+    /// </summary>
+    void InitializeEnemyDeck()
+    {
+        CardArea deckArea = cardSystem.GetCardArea(ENEMY_DECK_AREA);
+
+        // 添加蛮族勇士卡
+        for (int i = 0; i < 3; i++)
+        {
+            deckArea.InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+        }
+
+        // 添加蛮族刺客卡
+        for (int i = 0; i < 2; i++)
+        {
+            deckArea.InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
+        }
+
+        // 添加蛮族巫师卡
+        deckArea.InitCard(true, "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
     }
-  }
+
+    /// <summary>
+    /// 初始化战场格子
+    /// Initialize battle cubes
+    /// </summary>
+    void InitBattleCube(CardArea area, int row = 1, int column = 1)
+    {
+        for (int i = 0; i < row * column; i++)
+        {
+            GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/BattleCube");
+            BattleCube cube = Instantiate(toInstantiate, area.transform).GetComponent<BattleCube>();
+            cube.m_Row = i / column;
+            cube.m_Column = i % column;
+            cube.m_IsPlayer = area.m_CardAreaName.Contains("Player");
+            cube.battlemanager = this;
+        }
+    }
+
+    /// <summary>
+    /// 初始化战场
+    /// Initialize battle ground
+    /// </summary>
+    void InitBattleGround()
+    {
+        player.PrepareForBattle();
+        enemy.PrepareForBattle();
+        InitBattleCube(cardSystem.GetCardArea(PLAYER_BATTLE_AREA), 3, 3);
+        InitBattleCube(cardSystem.GetCardArea(ENEMY_BATTLE_AREA), 3, 3);
+    }
+
+    /// <summary>
+    /// 主循环更新
+    /// Main tick update
+    /// </summary>
+    public void Tick()
+    {
+        // 抽牌阶段
+        if (bDrawCard)
+        {
+            aiController.ExecuteAITurn(Level);
+            cardSystem.DrawCards(PLAYER_DROP_AREA, PLAYER_DECK_AREA, PLAYER_HAND_AREA, player.m_DrawCardCount);
+            bDrawCard = false;
+            bPushCard = true;
+            UpdatePreCalculation();
+        }
+
+        // 弃牌并开始战斗
+        if (bDropCard)
+        {
+            cardSystem.DiscardCards(PLAYER_DROP_AREA, PLAYER_HAND_AREA);
+            StartCoroutine(UpdateBattle());
+            bDropCard = false;
+        }
+
+        // 更新所有卡牌区域
+        UpdateAllCardAreas();
+
+        // 更新玩家和敌人
+        player.Tick();
+        enemy.Tick();
+    }
+
+    /// <summary>
+    /// 更新所有卡牌区域
+    /// Update all card areas
+    /// </summary>
+    void UpdateAllCardAreas()
+    {
+        foreach (CardArea area in cardSystem.GetAllCardAreas())
+        {
+            cardSystem.UpdateCardAreaCount(area);
+
+            if (!bShowAttack)
+            {
+                UpdateCardAnimation(area);
+            }
+
+            UpdateCardTick(area);
+        }
+    }
+
+    /// <summary>
+    /// 更新卡牌Tick
+    /// Update card tick
+    /// </summary>
+    void UpdateCardTick(CardArea area)
+    {
+        foreach (Card card in area.m_AreaList)
+        {
+            card.Tick();
+        }
+    }
+
+    /// <summary>
+    /// 更新卡牌动画状态
+    /// Update card animation state
+    /// </summary>
+    void UpdateCardAnimation(CardArea area)
+    {
+        UGUISpriteAnimation.AnimState animState = UGUISpriteAnimation.AnimState.RunBack;
+
+        if (area.m_CardAreaName.Contains("Enemy"))
+        {
+            animState = UGUISpriteAnimation.AnimState.RunToward;
+        }
+
+        foreach (Card card in area.m_AreaList)
+        {
+            if (card.m_CardType == Card.CardType.Character && !card.m_IsBattleDead)
+            {
+                card.animationConfig.SetAnimState(animState);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 更新预计算（显示预期伤害）
+    /// Update pre-calculation (show expected damage)
+    /// </summary>
+    void UpdatePreCalculation()
+    {
+        CardArea playerBattle = cardSystem.GetCardArea(PLAYER_BATTLE_AREA);
+        CardArea enemyBattle = cardSystem.GetCardArea(ENEMY_BATTLE_AREA);
+
+        battleCalculator.ClearExpectedDamage(playerBattle, enemyBattle);
+
+        int enemyDamage = battleCalculator.CalculateExpectedDamage(playerBattle, enemyBattle);
+        int playerDamage = battleCalculator.CalculateExpectedDamage(enemyBattle, playerBattle);
+
+        enemy.SetCurrentHurt(enemyDamage);
+        player.SetCurrentHurt(playerDamage);
+
+        // 更新反击伤害显示
+        UpdateCounterDamageDisplay(playerBattle, enemyBattle);
+    }
+
+    /// <summary>
+    /// 更新反击伤害显示
+    /// Update counter damage display
+    /// </summary>
+    void UpdateCounterDamageDisplay(CardArea playerBattle, CardArea enemyBattle)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            BattleCube playerCube = playerBattle.transform.GetChild(i).GetComponent<BattleCube>();
+            if (playerCube != null && playerCube.transform.childCount > 0)
+            {
+                Card playerCard = playerCube.transform.GetChild(0).GetComponent<Card>();
+                int counterDamage = CalculateCounterDamageForCard(enemyBattle, playerCard);
+                playerCard.GetHurtAPra(counterDamage);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 计算单张卡牌受到的反击伤害
+    /// Calculate counter damage for a single card
+    /// </summary>
+    int CalculateCounterDamageForCard(CardArea enemyBattle, Card playerCard)
+    {
+        int damage = 0;
+
+        for (int i = 0; i < 9; i++)
+        {
+            BattleCube enemyCube = enemyBattle.transform.GetChild(i).GetComponent<BattleCube>();
+            if (enemyCube != null && enemyCube.m_Column == playerCard.m_BattleColumn && enemyCube.transform.childCount > 0)
+            {
+                Card enemyCard = enemyCube.transform.GetChild(0).GetComponent<Card>();
+                damage += enemyCard.m_CurrentATK;
+            }
+        }
+
+        return damage;
+    }
+
+    /// <summary>
+    /// 战斗流程协程
+    /// Battle sequence coroutine
+    /// </summary>
+    IEnumerator UpdateBattle()
+    {
+        bShowAttack = true;
+        CardArea playerBattle = cardSystem.GetCardArea(PLAYER_BATTLE_AREA);
+        CardArea enemyBattle = cardSystem.GetCardArea(ENEMY_BATTLE_AREA);
+
+        // 逐列进行战斗
+        for (int column = 0; column < 3; column++)
+        {
+            // 计算每一行的伤害
+            for (int row = 0; row < 3; row++)
+            {
+                int damageToEnemy = battleCalculator.CalculateColumnRowDamage(playerBattle, enemyBattle, column, row);
+                int damageToPlayer = battleCalculator.CalculateColumnRowDamage(enemyBattle, playerBattle, column, row);
+
+                enemy.SetCurrentHP(-damageToEnemy);
+                player.SetCurrentHP(-damageToPlayer);
+            }
+
+            // 清除该列的预计算伤害
+            battleCalculator.ClearExpectedDamage(playerBattle, enemyBattle, column);
+
+            // 播放攻击动画
+            yield return PlayAttackAnimation(playerBattle, enemyBattle, column);
+
+            // 播放死亡动画
+            yield return PlayDeathAnimation(playerBattle, enemyBattle, column);
+
+            // 移除死亡的卡牌
+            battleCalculator.RemoveDeadCards(playerBattle, column);
+            battleCalculator.RemoveDeadCards(enemyBattle, column);
+        }
+
+        // 检查胜负
+        if (enemy.m_CurrentHP <= 0)
+        {
+            enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+            yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
+            NextStage();
+        }
+
+        if (player.m_CurrentHP <= 0)
+        {
+            player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+            yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
+            Dead();
+        }
+
+        bShowAttack = false;
+        bDrawCard = true;
+    }
+
+    /// <summary>
+    /// 播放攻击动画
+    /// Play attack animation
+    /// </summary>
+    IEnumerator PlayAttackAnimation(CardArea playerBattle, CardArea enemyBattle, int column)
+    {
+        bool hasCard = false;
+
+        foreach (Card card in playerBattle.m_AreaList)
+        {
+            if (card.m_BattleColumn == column)
+            {
+                hasCard = true;
+                card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackBack);
+            }
+        }
+
+        foreach (Card card in enemyBattle.m_AreaList)
+        {
+            if (card.m_BattleColumn == column)
+            {
+                hasCard = true;
+                card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.AttackToward);
+            }
+        }
+
+        if (hasCard)
+        {
+            yield return new WaitForSeconds(5 / UGUISpriteAnimation.FPS);
+        }
+    }
+
+    /// <summary>
+    /// 播放死亡动画
+    /// Play death animation
+    /// </summary>
+    IEnumerator PlayDeathAnimation(CardArea playerBattle, CardArea enemyBattle, int column)
+    {
+        bool isCardDead = false;
+
+        foreach (Card card in playerBattle.m_AreaList)
+        {
+            if (card.m_BattleColumn == column)
+            {
+                if (card.m_IsBattleDead)
+                {
+                    isCardDead = true;
+                    card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+                }
+                else
+                {
+                    card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
+                }
+            }
+        }
+
+        foreach (Card card in enemyBattle.m_AreaList)
+        {
+            if (card.m_BattleColumn == column)
+            {
+                if (card.m_IsBattleDead)
+                {
+                    isCardDead = true;
+                    card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.Dead);
+                }
+                else
+                {
+                    card.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
+                }
+            }
+        }
+
+        if (isCardDead)
+        {
+            yield return new WaitForSeconds(13 / UGUISpriteAnimation.FPS);
+        }
+    }
+
+    /// <summary>
+    /// 游戏结束
+    /// Game over
+    /// </summary>
+    public void Dead()
+    {
+        this.transform.Find("BattleEnd").gameObject.SetActive(true);
+        GameEvents.GameOver();
+    }
+
+    /// <summary>
+    /// 进入下一关
+    /// Next stage
+    /// </summary>
+    void NextStage()
+    {
+        CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
+        CardArea playerDeck = cardSystem.GetCardArea(PLAYER_DECK_AREA);
+        CardArea playerDrop = cardSystem.GetCardArea(PLAYER_DROP_AREA);
+        CardArea playerBattle = cardSystem.GetCardArea(PLAYER_BATTLE_AREA);
+        CardArea enemyBattle = cardSystem.GetCardArea(ENEMY_BATTLE_AREA);
+
+        // 洗牌
+        cardSystem.Shuffle(playerHand, playerDeck);
+        cardSystem.Shuffle(playerDrop, playerDeck);
+
+        // 恢复敌人生命
+        enemy.m_CurrentHP = enemy.m_HP;
+
+        // 清空战场
+        ClearBattleField(playerBattle);
+        ClearBattleField(enemyBattle);
+
+        // 升级
+        Level++;
+        player.SetCurrentHP(10, false);
+        enemy.m_PlayerName = "野蛮人 Lv" + Level;
+        this.transform.Find("Text_Stage").GetComponent<Text>().text = "Stage 1-" + Level;
+        enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
+
+        bDrawCard = true;
+        GameEvents.StageComplete(Level);
+    }
+
+    /// <summary>
+    /// 清空战场
+    /// Clear battlefield
+    /// </summary>
+    void ClearBattleField(CardArea battleArea)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            BattleCube cube = battleArea.transform.GetChild(i).GetComponent<BattleCube>();
+            if (cube != null && cube.transform.childCount > 0)
+            {
+                Card card = cube.transform.GetChild(0).GetComponent<Card>();
+                battleArea.m_AreaList.Remove(card);
+                Destroy(card.gameObject);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 选择战场格子（玩家放置卡牌）
+    /// Select battle cube (player places card)
+    /// </summary>
+    public void SelectBattleCube(BattleCube cube)
+    {
+        if (!bPushCard || !cube.m_IsPlayer) return;
+
+        CardArea playerBattle = cardSystem.GetCardArea(PLAYER_BATTLE_AREA);
+        CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
+        CardArea playerDrop = cardSystem.GetCardArea(PLAYER_DROP_AREA);
+
+        // 检查格子是否已被占用
+        foreach (Card card in playerBattle.m_AreaList)
+        {
+            if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
+                return;
+        }
+
+        // 检查是否有选中的卡牌和足够的费用
+        if (cSelectCard != null && player.m_CurrentCost >= cSelectCard.m_Cost)
+        {
+            player.m_CurrentCost -= cSelectCard.m_Cost;
+            cSelectCard.m_IsSelected = false;
+
+            cSelectCard.m_IsInBattleGround = true;
+            cSelectCard.gameObject.transform.SetParent(cube.gameObject.transform);
+            cSelectCard.gameObject.transform.position = cube.gameObject.transform.position;
+            cSelectCard.m_BattleRow = cube.m_Row;
+            cSelectCard.m_BattleColumn = cube.m_Column;
+
+            if (cSelectCard.m_CardType == Card.CardType.Character)
+            {
+                playerBattle.m_AreaList.Add(cSelectCard);
+
+                // 创建副本放入弃牌堆
+                GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
+                Card cloneCard = Instantiate(toInstantiate, this.transform.Find("Recycle")).GetComponent<Card>();
+                cloneCard.InitByClone(cSelectCard);
+                playerDrop.m_AreaList.Add(cloneCard);
+            }
+            else
+            {
+                // 魔法卡立即回到弃牌堆
+                cSelectCard.m_IsInBattleGround = false;
+                cSelectCard.gameObject.transform.SetParent(this.transform.Find("Recycle"));
+                playerDrop.m_AreaList.Add(cSelectCard);
+            }
+
+            // 应用特殊效果
+            specialEffectManager.ApplyCardPlacementEffects(cSelectCard, playerBattle);
+
+            playerHand.m_AreaList.Remove(cSelectCard);
+            cSelectCard = null;
+
+            // 更新预计算
+            UpdatePreCalculation();
+
+            GameEvents.CardPlaced(cSelectCard, cube.m_Row, cube.m_Column);
+        }
+    }
+
+    /// <summary>
+    /// 选择手牌
+    /// Select hand card
+    /// </summary>
+    public void SelectHandCard(Card card)
+    {
+        if (!bPushCard) return;
+
+        CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
+
+        // 取消其他卡牌的选中状态
+        foreach (Card handCard in playerHand.m_AreaList)
+        {
+            if (handCard != card)
+            {
+                handCard.m_IsSelected = false;
+            }
+        }
+
+        card.m_IsSelected = true;
+        cSelectCard = card;
+
+        GameEvents.CardSelected(card);
+    }
+
+    /// <summary>
+    /// 弃牌按钮点击
+    /// Drop button click
+    /// </summary>
+    public void OnDropButtonClick()
+    {
+        if (bPushCard)
+        {
+            player.m_CurrentCost = player.m_Cost;
+            bDropCard = true;
+        }
+    }
 }
