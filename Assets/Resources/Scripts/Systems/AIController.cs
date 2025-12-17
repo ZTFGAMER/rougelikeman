@@ -88,6 +88,9 @@ public class AIController
         newCard.m_BattleRow = cube.m_Row;
         newCard.m_BattleColumn = cube.m_Column;
 
+        // 禁用卡牌的点击，使其可穿透
+        newCard.SetRaycastTarget(false);
+
         // 添加到战场区域
         enemyBattleArea.m_AreaList.Add(newCard);
 

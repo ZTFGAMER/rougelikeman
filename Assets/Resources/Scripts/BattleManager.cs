@@ -597,11 +597,15 @@ public class BattleManager : MonoBehaviour
         CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
         CardArea playerDrop = cardSystem.GetCardArea(PLAYER_DROP_AREA);
 
-        // 检查格子是否已被占用
-        foreach (Card card in playerBattle.m_AreaList)
+        // 检查格子是否已被占用（仅对角色卡检查）
+        // Check if the cube is occupied (only for Character cards)
+        if (cSelectCard != null && cSelectCard.m_CardType == Card.CardType.Character)
         {
-            if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
-                return;
+            foreach (Card card in playerBattle.m_AreaList)
+            {
+                if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
+                    return;
+            }
         }
 
         // 检查是否有选中的卡牌和足够的费用
@@ -619,6 +623,9 @@ public class BattleManager : MonoBehaviour
             if (cSelectCard.m_CardType == Card.CardType.Character)
             {
                 playerBattle.m_AreaList.Add(cSelectCard);
+
+                // 禁用角色卡的点击，使其可穿透
+                cSelectCard.SetRaycastTarget(false);
 
                 // 创建副本放入弃牌堆
                 GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");

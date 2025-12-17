@@ -179,6 +179,9 @@ public class Card : MonoBehaviour {
     m_IsSelected = false;
     m_IsInBattleGround = false;
     m_IsBattleDead = false;
+
+    // 默认启用点击（手牌状态）
+    SetRaycastTarget(true);
   }
   public void ReadyToBattle()
   {
@@ -319,6 +322,27 @@ public class Card : MonoBehaviour {
     if (m_ObjectCardSelect != null)
     {
       m_ObjectCardSelect.SetActive(m_IsSelected);
+    }
+  }
+
+  /// <summary>
+  /// 设置卡牌是否接收射线检测（用于点击穿透）
+  /// Set whether card receives raycast (for click-through)
+  /// </summary>
+  public void SetRaycastTarget(bool enabled)
+  {
+    // 禁用/启用所有Image组件的raycastTarget
+    Image[] images = GetComponentsInChildren<Image>();
+    foreach (Image img in images)
+    {
+      img.raycastTarget = enabled;
+    }
+
+    // 禁用/启用所有Text组件的raycastTarget
+    Text[] texts = GetComponentsInChildren<Text>();
+    foreach (Text txt in texts)
+    {
+      txt.raycastTarget = enabled;
     }
   }
 }
