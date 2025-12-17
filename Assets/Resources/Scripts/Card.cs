@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class Card : MonoBehaviour {
+public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
   public enum CardType
   {
@@ -63,9 +64,17 @@ public class Card : MonoBehaviour {
 
   public BattleManager battleManager;
 
+  // 拖拽相关变量 / Drag-related variables
+  private bool isDragging = false;
+  private Transform originalParent;
+  private Vector3 originalPosition;
+  private int originalSiblingIndex;
+  private Canvas canvas;
+  private BattleCube currentHoveredCube;
+
   // Use this for initialization
   void Start() {
-
+    canvas = GetComponentInParent<Canvas>();
   }
   public void InitByClone(Card clonecard)
   {
@@ -345,4 +354,162 @@ public class Card : MonoBehaviour {
       txt.raycastTarget = enabled;
     }
   }
+
+  #region 拖拽实现 / Drag Implementation
+
+  /// <summary>
+  /// 开始拖拽
+  /// Begin drag
+  /// </summary>
+  public void OnBeginDrag(PointerEventData eventData)
+  {
+    // 只有在手牌区域且未在战场上的卡牌才能拖拽
+    if (m_IsInBattleGround || !battleManager.bPushCard) return;
+
+    isDragging = true;
+
+    // 记录原始状态
+    originalParent = transform.parent;
+    originalPosition = transform.position;
+    originalSiblingIndex = transform.GetSiblingIndex();
+
+    // 移动到Canvas层级以便显示在最上层
+    if (canvas != null)
+    {
+      transform.SetParent(canvas.transform);
+      transform.SetAsLastSibling();
+    }
+
+    // 取消所有卡牌的选中状态
+    CardArea playerHand = battleManager.transform.Find("PlayerHandArea").GetComponent<CardArea>();
+    if (playerHand != null)
+    {
+      foreach (Card card in playerHand.m_AreaList)
+      {
+        card.m_IsSelected = false;
+      }
+    }
+    battleManager.cSelectCard = null;
+  }
+
+  /// <summary>
+  /// 拖拽中
+  /// During drag
+  /// </summary>
+  public void OnDrag(PointerEventData eventData)
+  {
+    if (!isDragging) return;
+
+    // 卡牌跟随鼠标/手指
+    transform.position = eventData.position;
+
+    // 检测当前悬停的格子
+    BattleCube hoveredCube = GetBattleCubeUnderPointer(eventData);
+
+    // 如果悬停的格子发生变化
+    if (hoveredCube != currentHoveredCube)
+    {
+      // 清除之前格子的高亮
+      if (currentHoveredCube != null)
+      {
+        currentHoveredCube.SetHighlight(false, false);
+      }
+
+      currentHoveredCube = hoveredCube;
+
+      // 设置新格子的高亮
+      if (currentHoveredCube != null && currentHoveredCube.m_IsPlayer)
+      {
+        bool canPlace = CanPlaceAtCube(currentHoveredCube);
+        currentHoveredCube.SetHighlight(true, canPlace);
+      }
+    }
+  }
+
+  /// <summary>
+  /// 结束拖拽
+  /// End drag
+  /// </summary>
+  public void OnEndDrag(PointerEventData eventData)
+  {
+    if (!isDragging) return;
+
+    isDragging = false;
+
+    // 清除格子高亮
+    if (currentHoveredCube != null)
+    {
+      currentHoveredCube.SetHighlight(false, false);
+      currentHoveredCube = null;
+    }
+
+    // 尝试放置卡牌
+    BattleCube targetCube = GetBattleCubeUnderPointer(eventData);
+
+    if (targetCube != null && targetCube.m_IsPlayer && CanPlaceAtCube(targetCube))
+    {
+      // 成功放置
+      battleManager.SelectBattleCube(targetCube);
+    }
+    else
+    {
+      // 放置失败，返回原位置
+      transform.SetParent(originalParent);
+      transform.position = originalPosition;
+      transform.SetSiblingIndex(originalSiblingIndex);
+    }
+  }
+
+  /// <summary>
+  /// 获取鼠标/手指位置下的BattleCube
+  /// Get BattleCube under pointer
+  /// </summary>
+  private BattleCube GetBattleCubeUnderPointer(PointerEventData eventData)
+  {
+    List<RaycastResult> results = new List<RaycastResult>();
+    EventSystem.current.RaycastAll(eventData, results);
+
+    foreach (RaycastResult result in results)
+    {
+      BattleCube cube = result.gameObject.GetComponent<BattleCube>();
+      if (cube != null)
+      {
+        return cube;
+      }
+    }
+
+    return null;
+  }
+
+  /// <summary>
+  /// 检查是否可以在指定格子放置卡牌
+  /// Check if card can be placed at specified cube
+  /// </summary>
+  private bool CanPlaceAtCube(BattleCube cube)
+  {
+    if (!cube.m_IsPlayer || !battleManager.bPushCard) return false;
+
+    // 检查费用
+    if (battleManager.player.m_CurrentCost < m_Cost) return false;
+
+    // 对于角色卡，检查格子是否被占用
+    if (m_CardType == CardType.Character)
+    {
+      CardArea playerBattle = battleManager.transform.Find("PlayerBattleArea").GetComponent<CardArea>();
+      if (playerBattle != null)
+      {
+        foreach (Card card in playerBattle.m_AreaList)
+        {
+          if (card.m_BattleColumn == cube.m_Column && card.m_BattleRow == cube.m_Row)
+          {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  #endregion
 }
