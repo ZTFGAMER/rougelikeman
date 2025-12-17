@@ -31,6 +31,28 @@ public class CardArea : MonoBehaviour {
     this.m_AreaList.Add(card);
 
   }
+
+  /// <summary>
+  /// 使用CardData初始化卡牌
+  /// Initialize card using CardData
+  /// </summary>
+  public void InitCardFromData(CardData cardData)
+  {
+    GameObject toInstantiate = (GameObject)Resources.Load("Prefabs/HandCard");
+    Card card = Instantiate(toInstantiate, battlemanager.transform.Find("Recycle")).GetComponent<Card>();
+    card.battleManager = battlemanager;
+    card.m_IsEnemy = cardData.isEnemy;
+    card.ChangeHPAndATKLine();
+    card.m_CardName = cardData.cardName;
+    card.m_HurtEffect = cardData.hurtEffect;
+    card.ChangeHP(cardData.hp);
+    card.ChangeATK(cardData.attack);
+    card.m_Cost = cardData.cost;
+    card.m_CardType = cardData.cardType;
+    card.InitAnimation(cardData.animationName);
+    card.PrepareForBattle();
+    this.m_AreaList.Add(card);
+  }
   // Update is called once per frame
   void Update () {
 		

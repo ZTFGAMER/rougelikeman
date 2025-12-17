@@ -1,0 +1,148 @@
+﻿{
+    "cards": [
+        {
+            "id": "soldier",
+            "name": "士兵",
+            "animationName": "近卫兵",
+            "cost": 1,
+            "hp": 3,
+            "attack": 3,
+            "cardType": "Character",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "基础步兵单位"
+        },
+        {
+            "id": "archer",
+            "name": "弓箭手",
+            "animationName": "黄忠(骑马)",
+            "cost": 1,
+            "hp": 1,
+            "attack": 4,
+            "cardType": "Character",
+            "hurtEffect": "Backstab",
+            "faction": "player",
+            "description": "从后往前攻击的远程单位"
+        },
+        {
+            "id": "shield_guard",
+            "name": "盾手",
+            "animationName": "曹仁",
+            "cost": 1,
+            "hp": 5,
+            "attack": 1,
+            "cardType": "Character",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "高生命值的防御单位"
+        },
+        {
+            "id": "striker",
+            "name": "冲击手",
+            "animationName": "徐晃",
+            "cost": 2,
+            "hp": 3,
+            "attack": 3,
+            "cardType": "Character",
+            "hurtEffect": "Penetrate",
+            "faction": "player",
+            "description": "贯穿攻击该列所有单位"
+        },
+        {
+            "id": "commander",
+            "name": "指挥官",
+            "animationName": "夏侯敦(骑马)",
+            "cost": 2,
+            "hp": 2,
+            "attack": 2,
+            "cardType": "Character",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "根据场上友军数量增加攻击和生命值"
+        },
+        {
+            "id": "charge",
+            "name": "冲锋",
+            "animationName": "magiccross",
+            "cost": 1,
+            "hp": 0,
+            "attack": 0,
+            "cardType": "Magic",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "同行同列友军攻击力+2"
+        },
+        {
+            "id": "burst",
+            "name": "爆发",
+            "animationName": "magiccolumn",
+            "cost": 0,
+            "hp": 0,
+            "attack": 0,
+            "cardType": "Magic",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "同列友军攻击力x3，生命值变为1"
+        },
+        {
+            "id": "defend",
+            "name": "坚守",
+            "animationName": "magicrow",
+            "cost": 1,
+            "hp": 0,
+            "attack": 0,
+            "cardType": "Magic",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "同行友军生命值x2"
+        },
+        {
+            "id": "giant_shield",
+            "name": "巨盾",
+            "animationName": "magicall",
+            "cost": 1,
+            "hp": 0,
+            "attack": 0,
+            "cardType": "Magic",
+            "hurtEffect": "Normal",
+            "faction": "player",
+            "description": "所有友军生命值+5"
+        },
+        {
+            "id": "barbarian_warrior",
+            "name": "蛮族勇士",
+            "animationName": "黄盖",
+            "cost": 1,
+            "hp": 2,
+            "attack": 2,
+            "cardType": "Character",
+            "hurtEffect": "Normal",
+            "faction": "enemy",
+            "description": "蛮族基础战士"
+        },
+        {
+            "id": "barbarian_assassin",
+            "name": "蛮族刺客",
+            "animationName": "甘宁",
+            "cost": 1,
+            "hp": 1,
+            "attack": 3,
+            "cardType": "Character",
+            "hurtEffect": "Backstab",
+            "faction": "enemy",
+            "description": "蛮族背刺单位"
+        },
+        {
+            "id": "barbarian_shaman",
+            "name": "蛮族巫师",
+            "animationName": "谋士",
+            "cost": 1,
+            "hp": 1,
+            "attack": 2,
+            "cardType": "Character",
+            "hurtEffect": "Penetrate",
+            "faction": "enemy",
+            "description": "蛮族贯穿伤害单位"
+        }
+    ]
+}

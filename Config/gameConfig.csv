@@ -1,0 +1,16 @@
+category,key,value,description
+gameConstants,playerInitialHP,35,玩家初始生命值
+gameConstants,playerInitialEnergy,3,玩家初始能量
+gameConstants,enemyInitialHP,30,敌人初始生命值
+gameConstants,enemyInitialEnergy,3,敌人初始能量
+gameConstants,drawCardCount,5,每回合抽牌数
+gameConstants,battleGridRows,3,战场行数
+gameConstants,battleGridColumns,3,战场列数
+playerConfig,name,圣骑士,玩家角色名称
+playerConfig,animationName,曹操(骑马),玩家动画名称
+playerConfig,initialHP,35,玩家初始生命值
+playerConfig,initialEnergy,3,玩家初始能量
+enemyConfig,name,野蛮人,敌人角色名称
+enemyConfig,animationName,陆逊,敌人动画名称
+enemyConfig,initialHP,30,敌人初始生命值
+enemyConfig,initialEnergy,3,敌人初始能量

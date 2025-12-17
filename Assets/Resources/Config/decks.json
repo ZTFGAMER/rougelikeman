@@ -1,0 +1,30 @@
+﻿{
+  "decks": {
+    "playerStarterDeck": {
+      "cards": [
+        {"cardId": "soldier", "count": 3},
+        {"cardId": "archer", "count": 3},
+        {"cardId": "shield_guard", "count": 3},
+        {"cardId": "striker", "count": 1},
+        {"cardId": "commander", "count": 1},
+        {"cardId": "charge", "count": 1},
+        {"cardId": "burst", "count": 1},
+        {"cardId": "defend", "count": 1},
+        {"cardId": "giant_shield", "count": 1}
+      ],
+      "name": "圣骑士起始卡组",
+      "description": "圣骑士起始卡组配置",
+      "totalCards": 15
+    },
+    "enemyStarterDeck": {
+      "cards": [
+        {"cardId": "barbarian_warrior", "count": 3},
+        {"cardId": "barbarian_assassin", "count": 2},
+        {"cardId": "barbarian_shaman", "count": 1}
+      ],
+      "name": "野蛮人卡组",
+      "description": "野蛮人卡组配置",
+      "totalCards": 6
+    }
+  }
+}

@@ -1,0 +1,33 @@
+﻿{
+  "gameConstants": {
+    "playerInitialHP": 35,
+    "playerInitialEnergy": 3,
+    "enemyInitialHP": 30,
+    "enemyInitialEnergy": 3,
+    "drawCardCount": 5,
+    "battleGridRows": 3,
+    "battleGridColumns": 3
+  },
+  "playerConfig": {
+    "name": "圣骑士",
+    "animationName": "曹操(骑马)",
+    "initialHP": 35,
+    "initialEnergy": 3
+  },
+  "enemyConfig": {
+    "name": "野蛮人",
+    "animationName": "陆逊",
+    "initialHP": 30,
+    "initialEnergy": 3
+  },
+  "cardAreaNames": {
+    "playerHandArea": "PlayerHandArea",
+    "playerBattleArea": "PlayerBattleArea",
+    "playerDeckArea": "PlayerDeckArea",
+    "playerDropArea": "PlayerDropArea",
+    "enemyHandArea": "EnemyHandArea",
+    "enemyBattleArea": "EnemyBattleArea",
+    "enemyDeckArea": "EnemyDeckArea",
+    "enemyDropArea": "EnemyDropArea"
+  }
+}

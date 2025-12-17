@@ -41,6 +41,9 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
+        // 加载所有配置文件
+        ConfigManager.Instance.LoadAllConfigs();
+
         InitializeSystems();
         InitBattleData();
         InitBattleGround();
@@ -82,9 +85,12 @@ public class BattleManager : MonoBehaviour
             cardSystem.GetCardArea(ENEMY_DECK_AREA)
         );
 
-        // 初始化玩家和敌人
-        InitPlayer(player, "圣骑士", 35, 3, true, "曹操(骑马)");
-        InitPlayer(enemy, "野蛮人", 30, 3, false, "陆逊");
+        // 从配置文件初始化玩家和敌人
+        GameConfig config = ConfigManager.Instance.GetGameConfig();
+        InitPlayer(player, config.playerConfig.name, config.playerConfig.initialHP,
+                  config.playerConfig.initialEnergy, true, config.playerConfig.animationName);
+        InitPlayer(enemy, config.enemyConfig.name, config.enemyConfig.initialHP,
+                  config.enemyConfig.initialEnergy, false, config.enemyConfig.animationName);
         player.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunBack);
         enemy.animationConfig.SetAnimState(UGUISpriteAnimation.AnimState.RunToward);
 
@@ -142,66 +148,71 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 初始化玩家卡组
-    /// Initialize player deck
+    /// 初始化玩家卡组（从配置文件）
+    /// Initialize player deck (from config file)
     /// </summary>
     void InitializePlayerDeck()
     {
         CardArea dropArea = cardSystem.GetCardArea(PLAYER_DROP_AREA);
+        DeckData deckData = ConfigManager.Instance.GetDeck("playerStarterDeck");
 
-        // 添加士兵卡
-        for (int i = 0; i < 3; i++)
+        if (deckData == null)
         {
-            dropArea.InitCard(false, "士兵", "近卫兵", 1, 3, 3);
+            Debug.LogError("BattleManager: Failed to load player starter deck");
+            return;
         }
 
-        // 添加弓箭手卡
-        for (int i = 0; i < 3; i++)
+        foreach (DeckCardEntry entry in deckData.cards)
         {
-            dropArea.InitCard(false, "弓箭手", "黄忠(骑马)", 1, 1, 4, Card.CardType.Character, Card.HurtEffect.Backstab);
+            CardData cardData = CardDatabase.Instance.CreateCardData(entry.cardId);
+            if (cardData != null)
+            {
+                for (int i = 0; i < entry.count; i++)
+                {
+                    dropArea.InitCardFromData(cardData);
+                }
+            }
+            else
+            {
+                Debug.LogError($"BattleManager: Failed to create card with ID '{entry.cardId}'");
+            }
         }
 
-        // 添加盾手卡
-        for (int i = 0; i < 3; i++)
-        {
-            dropArea.InitCard(false, "盾手", "曹仁", 1, 5, 1);
-        }
-
-        // 添加冲击手卡
-        dropArea.InitCard(false, "冲击手", "徐晃", 2, 3, 3, Card.CardType.Character, Card.HurtEffect.Penetrate);
-
-        // 添加指挥官卡
-        dropArea.InitCard(false, "指挥官", "夏侯敦(骑马)", 2, 2, 2);
-
-        // 添加魔法卡
-        dropArea.InitCard(false, "冲锋", "magiccross", 1, 0, 0, Card.CardType.Magic);
-        dropArea.InitCard(false, "爆发", "magiccolumn", 0, 0, 0, Card.CardType.Magic);
-        dropArea.InitCard(false, "坚守", "magicrow", 1, 0, 0, Card.CardType.Magic);
-        dropArea.InitCard(false, "巨盾", "magicall", 2, 0, 0, Card.CardType.Magic);
+        Debug.Log($"BattleManager: Player deck initialized with {dropArea.m_AreaList.Count} cards");
     }
 
     /// <summary>
-    /// 初始化敌人卡组
-    /// Initialize enemy deck
+    /// 初始化敌人卡组（从配置文件）
+    /// Initialize enemy deck (from config file)
     /// </summary>
     void InitializeEnemyDeck()
     {
         CardArea deckArea = cardSystem.GetCardArea(ENEMY_DECK_AREA);
+        DeckData deckData = ConfigManager.Instance.GetDeck("enemyStarterDeck");
 
-        // 添加蛮族勇士卡
-        for (int i = 0; i < 3; i++)
+        if (deckData == null)
         {
-            deckArea.InitCard(true, "蛮族勇士", "黄盖", 1, 2, 2);
+            Debug.LogError("BattleManager: Failed to load enemy starter deck");
+            return;
         }
 
-        // 添加蛮族刺客卡
-        for (int i = 0; i < 2; i++)
+        foreach (DeckCardEntry entry in deckData.cards)
         {
-            deckArea.InitCard(true, "蛮族刺客", "甘宁", 1, 1, 3, Card.CardType.Character, Card.HurtEffect.Backstab);
+            CardData cardData = CardDatabase.Instance.CreateCardData(entry.cardId);
+            if (cardData != null)
+            {
+                for (int i = 0; i < entry.count; i++)
+                {
+                    deckArea.InitCardFromData(cardData);
+                }
+            }
+            else
+            {
+                Debug.LogError($"BattleManager: Failed to create card with ID '{entry.cardId}'");
+            }
         }
 
-        // 添加蛮族巫师卡
-        deckArea.InitCard(true, "蛮族巫师", "谋士", 1, 1, 2, Card.CardType.Character, Card.HurtEffect.Penetrate);
+        Debug.Log($"BattleManager: Enemy deck initialized with {deckArea.m_AreaList.Count} cards");
     }
 
     /// <summary>

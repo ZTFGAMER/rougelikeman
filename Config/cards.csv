@@ -1,0 +1,13 @@
+id,name,animationName,cost,hp,attack,cardType,hurtEffect,faction,description
+soldier,士兵,近卫兵,1,3,3,Character,Normal,player,基础步兵单位
+archer,弓箭手,黄忠(骑马),1,1,4,Character,Backstab,player,从后往前攻击的远程单位
+shield_guard,盾手,曹仁,1,5,1,Character,Normal,player,高生命值的防御单位
+striker,冲击手,徐晃,2,3,3,Character,Penetrate,player,贯穿攻击该列所有单位
+commander,指挥官,夏侯敦(骑马),2,2,2,Character,Normal,player,根据场上友军数量增加攻击和生命值
+charge,冲锋,magiccross,1,0,0,Magic,Normal,player,同行同列友军攻击力+2
+burst,爆发,magiccolumn,0,0,0,Magic,Normal,player,同列友军攻击力x3，生命值变为1
+defend,坚守,magicrow,1,0,0,Magic,Normal,player,同行友军生命值x2
+giant_shield,巨盾,magicall,1,0,0,Magic,Normal,player,所有友军生命值+5
+barbarian_warrior,蛮族勇士,黄盖,1,2,2,Character,Normal,enemy,蛮族基础战士
+barbarian_assassin,蛮族刺客,甘宁,1,1,3,Character,Backstab,enemy,蛮族背刺单位
+barbarian_shaman,蛮族巫师,谋士,1,1,2,Character,Penetrate,enemy,蛮族贯穿伤害单位

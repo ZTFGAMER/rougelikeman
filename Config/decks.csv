@@ -1,0 +1,13 @@
+deckId,deckName,cardId,count,description
+playerStarterDeck,圣骑士起始卡组,soldier,3,基础步兵
+playerStarterDeck,圣骑士起始卡组,archer,3,远程射手
+playerStarterDeck,圣骑士起始卡组,shield_guard,3,防御单位
+playerStarterDeck,圣骑士起始卡组,striker,1,贯穿攻击
+playerStarterDeck,圣骑士起始卡组,commander,1,指挥官
+playerStarterDeck,圣骑士起始卡组,charge,1,魔法-冲锋
+playerStarterDeck,圣骑士起始卡组,burst,1,魔法-爆发
+playerStarterDeck,圣骑士起始卡组,defend,1,魔法-坚守
+playerStarterDeck,圣骑士起始卡组,giant_shield,1,魔法-巨盾
+enemyStarterDeck,野蛮人卡组,barbarian_warrior,3,蛮族战士
+enemyStarterDeck,野蛮人卡组,barbarian_assassin,2,蛮族刺客
+enemyStarterDeck,野蛮人卡组,barbarian_shaman,1,蛮族巫师
