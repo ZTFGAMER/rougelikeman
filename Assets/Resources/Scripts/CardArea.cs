@@ -44,6 +44,7 @@ public class CardArea : MonoBehaviour {
     card.m_IsEnemy = cardData.isEnemy;
     card.ChangeHPAndATKLine();
     card.m_CardName = cardData.cardName;
+    card.m_Description = cardData.description;
     card.m_HurtEffect = cardData.hurtEffect;
     card.ChangeHP(cardData.hp);
     card.ChangeATK(cardData.attack);

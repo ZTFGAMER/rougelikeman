@@ -29,6 +29,7 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     Penetrate = 8,//贯穿，对所有排上的敌人造成伤害
   };
   public string m_CardName;
+  public string m_Description;  // 卡牌描述
   public int m_HP = 0;
   public int m_Cost;
   public int m_ATK = 0;
@@ -64,6 +65,11 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
   public BattleManager battleManager;
 
+  // 详情气泡相关 / Detail bubble related
+  public GameObject m_BubbleNode;      // 气泡节点
+  public Text m_BubbleText;            // 气泡文本框
+  private bool isShowingDetail = false;
+
   // 拖拽相关变量 / Drag-related variables
   private bool isDragging = false;
   private Transform originalParent;
@@ -82,6 +88,7 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     m_IsEnemy = clonecard.m_IsEnemy;
     ChangeHPAndATKLine();
     m_CardName = clonecard.m_CardName;
+    m_Description = clonecard.m_Description;
     m_HurtEffect = clonecard.m_HurtEffect;
     ChangeHP(clonecard.m_HP);
     ChangeATK(clonecard.m_ATK);
@@ -191,6 +198,9 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     // 默认启用点击（手牌状态）
     SetRaycastTarget(true);
+
+    // 隐藏详情气泡
+    HideDetail();
   }
   public void ReadyToBattle()
   {
@@ -355,6 +365,71 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     }
   }
 
+  // 用于保存气泡的原始父对象，以便隐藏时恢复
+  private Transform bubbleOriginalParent;
+  private int bubbleOriginalSiblingIndex;
+  private Vector3 bubbleOriginalLocalPosition;
+
+  /// <summary>
+  /// 显示卡牌详情
+  /// Show card details
+  /// </summary>
+  public void ShowDetail()
+  {
+    if (m_BubbleNode == null || m_BubbleText == null) return;
+
+    isShowingDetail = true;
+
+    // 保存原始父对象和本地位置
+    if (bubbleOriginalParent == null)
+    {
+      bubbleOriginalParent = m_BubbleNode.transform.parent;
+      bubbleOriginalSiblingIndex = m_BubbleNode.transform.GetSiblingIndex();
+      bubbleOriginalLocalPosition = m_BubbleNode.transform.localPosition;
+    }
+
+    // 将气泡移到Canvas层级，确保显示在最上层
+    if (canvas != null)
+    {
+      // 保存世界位置
+      Vector3 worldPosition = m_BubbleNode.transform.position;
+
+      // 移动到Canvas层级
+      m_BubbleNode.transform.SetParent(canvas.transform);
+      m_BubbleNode.transform.SetAsLastSibling();
+
+      // 恢复世界位置，保持相对于卡牌的位置
+      m_BubbleNode.transform.position = worldPosition;
+    }
+
+    m_BubbleNode.SetActive(true);
+
+    // 显示卡牌描述
+    m_BubbleText.text = m_Description;
+  }
+
+  /// <summary>
+  /// 隐藏卡牌详情
+  /// Hide card details
+  /// </summary>
+  public void HideDetail()
+  {
+    if (m_BubbleNode == null) return;
+
+    isShowingDetail = false;
+
+    // 先恢复气泡到原始父对象和位置，再隐藏
+    if (bubbleOriginalParent != null)
+    {
+      m_BubbleNode.transform.SetParent(bubbleOriginalParent);
+      m_BubbleNode.transform.SetSiblingIndex(bubbleOriginalSiblingIndex);
+      m_BubbleNode.transform.localPosition = bubbleOriginalLocalPosition;
+    }
+
+    // 最后隐藏气泡
+    m_BubbleNode.SetActive(false);
+  }
+
   #region 拖拽实现 / Drag Implementation
 
   /// <summary>
@@ -380,13 +455,14 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
       transform.SetAsLastSibling();
     }
 
-    // 取消所有卡牌的选中状态
+    // 取消所有卡牌的选中状态并隐藏气泡
     CardArea playerHand = battleManager.transform.Find("PlayerHandArea").GetComponent<CardArea>();
     if (playerHand != null)
     {
       foreach (Card card in playerHand.m_AreaList)
       {
         card.m_IsSelected = false;
+        card.HideDetail();
       }
     }
     battleManager.cSelectCard = null;
@@ -457,6 +533,22 @@ public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
       transform.SetParent(originalParent);
       transform.position = originalPosition;
       transform.SetSiblingIndex(originalSiblingIndex);
+    }
+
+    // 拖动结束后，清除所有详情显示
+    ClearAllDetails();
+  }
+
+  /// <summary>
+  /// 清除所有卡牌的详情显示
+  /// Clear all card details
+  /// </summary>
+  private void ClearAllDetails()
+  {
+    // 使用BattleManager的全局方法隐藏所有详情
+    if (battleManager != null)
+    {
+      battleManager.HideAllCardDetails();
     }
   }
 

@@ -120,7 +120,8 @@ public class CardDatabase
             config.attack,
             cardType,
             hurtEffect,
-            isEnemy
+            isEnemy,
+            config.description
         );
     }
 

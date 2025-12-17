@@ -27,6 +27,9 @@ public class BattleManager : MonoBehaviour
     public bool bShowAttack = false;
     public int iDrawCardCount = 0;
     public Card cSelectCard;
+    public Card cSelectedBattleCard;  // 选中的场上单位
+    public BattleCube cSelectedBattleCube;  // 选中单位所在的格子
+    public Card cCurrentDetailCard;  // 当前显示详情的卡牌（全局唯一）
     public int Level = 1;
 
     // 卡牌区域名称常量 / Card Area Name Constants
@@ -647,6 +650,9 @@ public class BattleManager : MonoBehaviour
             playerHand.m_AreaList.Remove(cSelectCard);
             cSelectCard = null;
 
+            // 隐藏所有详情
+            HideAllCardDetails();
+
             // 更新预计算
             UpdatePreCalculation();
 
@@ -664,6 +670,18 @@ public class BattleManager : MonoBehaviour
 
         CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
 
+        // 如果点击的是已选中的手牌，取消选中
+        if (cSelectCard == card && card.m_IsSelected)
+        {
+            card.m_IsSelected = false;
+            HideAllCardDetails();
+            cSelectCard = null;
+            return;
+        }
+
+        // 清除场上单位的选中状态
+        ClearBattleCardSelection();
+
         // 取消其他卡牌的选中状态
         foreach (Card handCard in playerHand.m_AreaList)
         {
@@ -676,7 +694,102 @@ public class BattleManager : MonoBehaviour
         card.m_IsSelected = true;
         cSelectCard = card;
 
+        // 显示手牌详情（全局唯一）
+        ShowCardDetail(card);
+
         GameEvents.CardSelected(card);
+    }
+
+    /// <summary>
+    /// 选择场上的卡牌（支持查看敌人）
+    /// Select battle card (supports viewing enemy cards)
+    /// </summary>
+    public void SelectBattleCard(Card card, BattleCube cube)
+    {
+        if (!bPushCard) return;
+
+        // 如果点击的是已经选中的单位，取消选中
+        if (cSelectedBattleCard == card)
+        {
+            ClearBattleCardSelection();
+            HideAllCardDetails();
+            return;
+        }
+
+        // 清除之前选中的场上单位
+        ClearBattleCardSelection();
+
+        // 清除手牌的选中状态
+        CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
+        if (playerHand != null)
+        {
+            foreach (Card handCard in playerHand.m_AreaList)
+            {
+                handCard.m_IsSelected = false;
+            }
+        }
+        cSelectCard = null;
+
+        // 选中新的场上单位
+        cSelectedBattleCard = card;
+        cSelectedBattleCube = cube;
+        cube.SetSelected(true);
+
+        // 显示场上单位的详情（全局唯一）
+        ShowCardDetail(card);
+
+        GameEvents.CardSelected(card);
+    }
+
+    /// <summary>
+    /// 清除场上单位的选中状态
+    /// Clear battle card selection
+    /// </summary>
+    private void ClearBattleCardSelection()
+    {
+        if (cSelectedBattleCard != null)
+        {
+            cSelectedBattleCard.HideDetail();
+            cSelectedBattleCard = null;
+        }
+
+        if (cSelectedBattleCube != null)
+        {
+            cSelectedBattleCube.SetSelected(false);
+            cSelectedBattleCube = null;
+        }
+    }
+
+    /// <summary>
+    /// 显示卡牌详情（全局唯一，自动隐藏之前的）
+    /// Show card detail (globally unique, auto-hide previous)
+    /// </summary>
+    public void ShowCardDetail(Card card)
+    {
+        if (card == null) return;
+
+        // 如果之前有显示详情的卡牌，先隐藏
+        if (cCurrentDetailCard != null && cCurrentDetailCard != card)
+        {
+            cCurrentDetailCard.HideDetail();
+        }
+
+        // 显示新的详情
+        cCurrentDetailCard = card;
+        card.ShowDetail();
+    }
+
+    /// <summary>
+    /// 隐藏所有卡牌详情
+    /// Hide all card details
+    /// </summary>
+    public void HideAllCardDetails()
+    {
+        if (cCurrentDetailCard != null)
+        {
+            cCurrentDetailCard.HideDetail();
+            cCurrentDetailCard = null;
+        }
     }
 
     /// <summary>
@@ -687,6 +800,22 @@ public class BattleManager : MonoBehaviour
     {
         if (bPushCard)
         {
+            // 清除所有选中状态
+            ClearBattleCardSelection();
+
+            CardArea playerHand = cardSystem.GetCardArea(PLAYER_HAND_AREA);
+            if (playerHand != null)
+            {
+                foreach (Card handCard in playerHand.m_AreaList)
+                {
+                    handCard.m_IsSelected = false;
+                }
+            }
+            cSelectCard = null;
+
+            // 隐藏所有详情
+            HideAllCardDetails();
+
             player.m_CurrentCost = player.m_Cost;
             bDropCard = true;
         }

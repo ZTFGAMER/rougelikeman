@@ -17,6 +17,7 @@ public class BattleCube : MonoBehaviour {
   // 高亮颜色 / Highlight colors
   private Color validColor = new Color(0.5f, 1f, 0.5f, 0.3f);   // 淡绿色
   private Color invalidColor = new Color(1f, 0.5f, 0.5f, 0.3f); // 淡红色
+  private Color selectedColor = new Color(1f, 1f, 1f, 0.3f);   // 淡白色（选中）
 
   // Use this for initialization
   void Start () {
@@ -34,7 +35,21 @@ public class BattleCube : MonoBehaviour {
 
   public void PushCard()
   {
-    battlemanager.SelectBattleCube(this);
+    // 优先检查格子上是否有单位
+    if (this.transform.childCount > 0)
+    {
+      // 如果有单位，选中场上单位（无论是否有手牌选中）
+      Card card = this.transform.GetChild(0).GetComponent<Card>();
+      if (card != null)
+      {
+        battlemanager.SelectBattleCard(card, this);
+      }
+    }
+    // 如果格子是空的，且有选中的手牌，尝试放置卡牌
+    else if (battlemanager.cSelectCard != null)
+    {
+      battlemanager.SelectBattleCube(this);
+    }
   }
 
   /// <summary>
@@ -59,6 +74,28 @@ public class BattleCube : MonoBehaviour {
     else
     {
       isHighlighted = false;
+      backgroundImage.color = originalColor;
+    }
+  }
+
+  /// <summary>
+  /// 设置选中状态（淡白色）
+  /// Set selected state (light white)
+  /// </summary>
+  public void SetSelected(bool selected)
+  {
+    if (backgroundImage == null)
+    {
+      backgroundImage = GetComponent<Image>();
+      if (backgroundImage == null) return;
+    }
+
+    if (selected)
+    {
+      backgroundImage.color = selectedColor;
+    }
+    else
+    {
       backgroundImage.color = originalColor;
     }
   }

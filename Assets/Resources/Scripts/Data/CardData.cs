@@ -9,6 +9,7 @@ public class CardData
 {
     public string cardName;
     public string animationName;
+    public string description;  // 卡牌描述
     public int cost;
     public int hp;
     public int attack;
@@ -19,10 +20,12 @@ public class CardData
     public CardData(string name, string animName, int cost, int hp, int attack,
                     Card.CardType type = Card.CardType.Character,
                     Card.HurtEffect effect = Card.HurtEffect.Normal,
-                    bool isEnemy = false)
+                    bool isEnemy = false,
+                    string description = "")
     {
         this.cardName = name;
         this.animationName = animName;
+        this.description = description;
         this.cost = cost;
         this.hp = hp;
         this.attack = attack;
@@ -37,6 +40,6 @@ public class CardData
     /// </summary>
     public CardData Clone()
     {
-        return new CardData(cardName, animationName, cost, hp, attack, cardType, hurtEffect, isEnemy);
+        return new CardData(cardName, animationName, cost, hp, attack, cardType, hurtEffect, isEnemy, description);
     }
 }
